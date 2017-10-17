@@ -1,0 +1,26 @@
+{
+  "name": "comp-grafica2017",
+  "version": "1.0.0",
+  "description": "biblioteca contendo algoritmos conceitos para computação gráfica",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kaeuchoa/comp-grafica2017.git"
+  },
+  "keywords": [
+    "computaçao",
+    "grafica"
+  ],
+  "author": "kaeuchoa",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/kaeuchoa/comp-grafica2017/issues"
+  },
+  "homepage": "https://github.com/kaeuchoa/comp-grafica2017#readme",
+  "dependencies": {
+    "webpack": "^3.7.1"
+  }
+}
