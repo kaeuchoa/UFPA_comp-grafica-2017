@@ -22,5 +22,8 @@
   "homepage": "https://github.com/kaeuchoa/comp-grafica2017#readme",
   "dependencies": {
     "webpack": "^3.7.1"
+  },
+  "devDependencies": {
+    "webpack": "^3.8.1"
   }
 }
