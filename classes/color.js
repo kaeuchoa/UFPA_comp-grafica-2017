@@ -9,7 +9,7 @@ class Color {
         return [this.r,this.g,this.b];
     }
 
-    getStyle(){
+    getRGB(){
         return "rgb("+ this.r +  "," + this.g + "," + this.b + ")"
     }
 

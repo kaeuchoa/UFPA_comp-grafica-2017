@@ -13,7 +13,7 @@ class FrameBuffer {
 
         for (var i =0; i <this.height; i++){
             for (var j = 0 ; j < this.width ; j++){
-                this.frameBuffer[i][j] = new Pixel(j,i,new Color(200,200,200));
+                this.frameBuffer[i][j] = new Pixel(j,i,new Color(255,255,255));
             }
         }
     }

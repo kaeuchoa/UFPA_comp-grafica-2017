@@ -60,25 +60,53 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 0);
+/******/ 	return __webpack_require__(__webpack_require__.s = 1);
 /******/ })
 /************************************************************************/
 /******/ ([
 /* 0 */
+/***/ (function(module, exports) {
+
+class Color {
+    constructor(r, g, b) {
+        this.r = r;
+        this.g = g;
+        this.b = b;
+    }
+
+    getColor(){
+        return [this.r,this.g,this.b];
+    }
+
+    getRGB(){
+        return "rgb("+ this.r +  "," + this.g + "," + this.b + ")"
+    }
+
+    setColor(r,g,b){
+        this.r = r;
+        this.g = g;
+        this.b = b;
+    }
+}
+
+module.exports = Color;
+
+/***/ }),
+/* 1 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__classes_utils__ = __webpack_require__(6);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__classes_utils__ = __webpack_require__(2);
 // IMPORTS
 
-let Color = __webpack_require__ (1);
-let FrameBuffer = __webpack_require__ (2);
-let Algorithms = __webpack_require__(4);
+let Color = __webpack_require__ (0);
+let FrameBuffer = __webpack_require__ (3);
+let Algorithms = __webpack_require__(5);
 
 // CONFIGS
-const WIDTH = 35;
-const HEIGHT = 50;
+const WIDTH = 25;
+const HEIGHT = 25;
 
 // Control variable
 let countClicks = 0;
@@ -98,9 +126,9 @@ function paintPoints(){
     }
 }
 
-var grid = Object(__WEBPACK_IMPORTED_MODULE_0__classes_utils__["a" /* default */])(WIDTH,HEIGHT,function(el,x,y){
+var grid = Object(__WEBPACK_IMPORTED_MODULE_0__classes_utils__["a" /* default */])(HEIGHT,WIDTH,function(el,x,y){
     console.log("You clicked on element:",el);
-    console.log("You clicked on item #:",x,y);
+    // console.log("You clicked on item #:",x,y);
 
     if(countClicks === 0){
         countClicks++;
@@ -111,12 +139,15 @@ var grid = Object(__WEBPACK_IMPORTED_MODULE_0__classes_utils__["a" /* default */
         endCoordinates.y = y;
         // paint
         // TODO: check which algorithm should be used
+        console.log("Started Bresenham");
         let pixelsToPaint = Algorithms.bresenham(startCoordinates,endCoordinates);
+        console.log(pixelsToPaint);
         console.log("Finished Bresenham");
         for (let i=0; i < pixelsToPaint.length -1 ; i+=2){
             frameBuffer.getPixel(pixelsToPaint[i],pixelsToPaint[i+1]).color = new Color(200,0,0);
         }
-        paintCanvas();
+        paintPoints();
+        console.log(frameBuffer);
         // reset
         countClicks = 0;
         startCoordinates = {};
@@ -124,7 +155,7 @@ var grid = Object(__WEBPACK_IMPORTED_MODULE_0__classes_utils__["a" /* default */
     }
 
     el.className='clicked';
-    el.style.backgroundColor = "black";
+    el.style.backgroundColor = "rgb(200,0,0)";
 
 
     // let asd = document.getElementById(x + "-" + y);
@@ -141,39 +172,40 @@ document.body.appendChild(grid);
 
 
 /***/ }),
-/* 1 */
-/***/ (function(module, exports) {
+/* 2 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
 
-class Color {
-    constructor(r, g, b) {
-        this.r = r;
-        this.g = g;
-        this.b = b;
+"use strict";
+/* harmony export (immutable) */ __webpack_exports__["a"] = clickableGrid;
+function clickableGrid( rows, cols, callback ){
+    var grid = document.createElement('table');
+    var x,y;
+    grid.className = 'grid';
+    for (var r=0;r<rows;++r){
+        var tr = grid.appendChild(document.createElement('tr'));
+        for (var c=0;c<cols;++c){
+            var cell = tr.appendChild(document.createElement('td'));
+            x = c;
+            y = r;
+            cell.id = x + "-" + y;
+            cell.addEventListener('click',(function(el,x,y){
+                return function(){
+                    callback(el,x,y);
+                }
+            })(cell,x,y),false);
+        }
     }
-
-    getColor(){
-        return [this.r,this.g,this.b];
-    }
-
-    getStyle(){
-        return "rgb("+ this.r +  "," + this.g + "," + this.b + ")"
-    }
-
-    setColor(r,g,b){
-        this.r = r;
-        this.g = g;
-        this.b = b;
-    }
+    return grid;
 }
 
-module.exports = Color;
+
 
 /***/ }),
-/* 2 */
+/* 3 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var Pixel = __webpack_require__(3);
-var Color = __webpack_require__ (1);
+var Pixel = __webpack_require__(4);
+var Color = __webpack_require__ (0);
 
 class FrameBuffer {
 
@@ -187,7 +219,7 @@ class FrameBuffer {
 
         for (var i =0; i <this.height; i++){
             for (var j = 0 ; j < this.width ; j++){
-                this.frameBuffer[i][j] = new Pixel(j,i,new Color(200,200,200));
+                this.frameBuffer[i][j] = new Pixel(j,i,new Color(255,255,255));
             }
         }
     }
@@ -204,10 +236,10 @@ class FrameBuffer {
 module.exports = FrameBuffer;
 
 /***/ }),
-/* 3 */
+/* 4 */
 /***/ (function(module, exports, __webpack_require__) {
 
-const color = __webpack_require__ (1)
+const color = __webpack_require__ (0)
 
 class Pixel{
     constructor(x,y,color){
@@ -245,7 +277,7 @@ class Pixel{
 module.exports = Pixel;
 
 /***/ }),
-/* 4 */
+/* 5 */
 /***/ (function(module, exports) {
 
 class Algorithms{
@@ -335,36 +367,6 @@ class Algorithms{
 }
 
 module.exports = Algorithms;
-
-/***/ }),
-/* 5 */,
-/* 6 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony export (immutable) */ __webpack_exports__["a"] = clickableGrid;
-function clickableGrid( rows, cols, callback ){
-    var grid = document.createElement('table');
-    var x,y;
-    grid.className = 'grid';
-    for (var r=0;r<rows;++r){
-        var tr = grid.appendChild(document.createElement('tr'));
-        for (var c=0;c<cols;++c){
-            var cell = tr.appendChild(document.createElement('td'));
-            x = c;
-            y = r;
-            cell.id = x + "-" + y;
-            cell.addEventListener('click',(function(el,x,y){
-                return function(){
-                    callback(el,x,y);
-                }
-            })(cell,x,y),false);
-        }
-    }
-    return grid;
-}
-
-
 
 /***/ })
 /******/ ]);
