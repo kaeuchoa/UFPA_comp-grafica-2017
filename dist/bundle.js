@@ -65,12 +65,40 @@
 /************************************************************************/
 /******/ ([
 /* 0 */
-/***/ (function(module, exports) {
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
 
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__classes_utils__ = __webpack_require__(6);
+// IMPORTS
+
+let Color = __webpack_require__ (1);
+let FrameBuffer = __webpack_require__ (2);
+let Algorithms = __webpack_require__(4);
+
+// CONFIGS
+const WIDTH = 35;
+const HEIGHT = 50;
+
+// Control variable
 let countClicks = 0;
+
+// Grid Related
+let frameBuffer = new FrameBuffer(WIDTH,HEIGHT);
 let startCoordinates = {};
 let endCoordinates = {};
-var grid = clickableGrid(35,50,function(el,x,y){
+
+function paintPoints(){
+    for (let y=0; y<frameBuffer.height; y++){
+        for (let x=0; x<frameBuffer.width; x++){
+            let pixel = document.getElementById(x + "-" + y);
+            pixel.style.backgroundColor = frameBuffer.getPixel(x,y).color.getRGB();
+
+        }
+    }
+}
+
+var grid = Object(__WEBPACK_IMPORTED_MODULE_0__classes_utils__["a" /* default */])(WIDTH,HEIGHT,function(el,x,y){
     console.log("You clicked on element:",el);
     console.log("You clicked on item #:",x,y);
 
@@ -82,7 +110,13 @@ var grid = clickableGrid(35,50,function(el,x,y){
         endCoordinates.x = x;
         endCoordinates.y = y;
         // paint
-
+        // TODO: check which algorithm should be used
+        let pixelsToPaint = Algorithms.bresenham(startCoordinates,endCoordinates);
+        console.log("Finished Bresenham");
+        for (let i=0; i < pixelsToPaint.length -1 ; i+=2){
+            frameBuffer.getPixel(pixelsToPaint[i],pixelsToPaint[i+1]).color = new Color(200,0,0);
+        }
+        paintCanvas();
         // reset
         countClicks = 0;
         startCoordinates = {};
@@ -100,6 +134,215 @@ var grid = clickableGrid(35,50,function(el,x,y){
 
 document.body.appendChild(grid);
 
+
+
+
+
+
+
+/***/ }),
+/* 1 */
+/***/ (function(module, exports) {
+
+class Color {
+    constructor(r, g, b) {
+        this.r = r;
+        this.g = g;
+        this.b = b;
+    }
+
+    getColor(){
+        return [this.r,this.g,this.b];
+    }
+
+    getStyle(){
+        return "rgb("+ this.r +  "," + this.g + "," + this.b + ")"
+    }
+
+    setColor(r,g,b){
+        this.r = r;
+        this.g = g;
+        this.b = b;
+    }
+}
+
+module.exports = Color;
+
+/***/ }),
+/* 2 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var Pixel = __webpack_require__(3);
+var Color = __webpack_require__ (1);
+
+class FrameBuffer {
+
+    constructor (width,height){
+        this.height = height;
+        this.width = width;
+        this.frameBuffer = new Array(height);
+        for (var i=0 ; i< height; i++){
+            this.frameBuffer[i] = new Array(width);
+        }
+
+        for (var i =0; i <this.height; i++){
+            for (var j = 0 ; j < this.width ; j++){
+                this.frameBuffer[i][j] = new Pixel(j,i,new Color(200,200,200));
+            }
+        }
+    }
+
+    getPixel(x,y){
+        return this.frameBuffer[y][x];
+    }
+
+    setPixel(x,y,color){
+        this.frameBuffer[y][x];
+    }
+}
+
+module.exports = FrameBuffer;
+
+/***/ }),
+/* 3 */
+/***/ (function(module, exports, __webpack_require__) {
+
+const color = __webpack_require__ (1)
+
+class Pixel{
+    constructor(x,y,color){
+        this._size = 10;
+        this._padding = this.size * 1.3;
+        this._x = x;
+        this._y = y;
+        this._color = color;
+    }
+    get size() {
+        return this._size;
+    }
+
+    get padding() {
+        return this._padding;
+    }
+
+    get x() {
+        return this._x;
+    }
+
+    get y() {
+        return this._y;
+    }
+
+    get color() {
+        return this._color;
+    }
+    set color(color) {
+        this._color = color;
+    }
+
+}
+
+module.exports = Pixel;
+
+/***/ }),
+/* 4 */
+/***/ (function(module, exports) {
+
+class Algorithms{
+
+    static bresenham(startCoordinates,endCoordinates){
+        // Flags to keep track of what's done in reflection stage
+        let swapXY = false, swapX = false, swapY = false;
+        // Calculates m before reflection stage
+        let deltaX = Math.abs(endCoordinates.x - startCoordinates.x);
+        let deltaY = Math.abs(endCoordinates.y - startCoordinates.y);
+        let m = deltaY/deltaX;
+        // Reflection
+        if(m > 1 || m < -1 ){
+            let aux = startCoordinates.x;
+            startCoordinates.x = startCoordinates.y, startCoordinates.y = aux;
+            aux = endCoordinates.x;
+            endCoordinates.x = endCoordinates.y, endCoordinates.y = aux;
+            swapXY = true;
+        }
+        if (startCoordinates.x > endCoordinates.x) {
+            startCoordinates.x = -startCoordinates.x;
+            endCoordinates.x = -endCoordinates.x;
+            swapX = true;
+        }
+        if (startCoordinates.y > endCoordinates.y) {
+            startCoordinates.y = -startCoordinates.y;
+            endCoordinates.y = -endCoordinates.y;
+            swapY = true;
+        }
+        // Control variables
+        let x = startCoordinates.x, y = startCoordinates.y;
+        // Final Array that keeps all the coordinates found by the algorithm
+
+        // console.log("x | y  | e");
+
+        let pixelsToPaint = [x,y];
+        // Calculates m after reflection stage
+        deltaX = Math.abs(endCoordinates.x - startCoordinates.x);
+        deltaY = Math.abs(endCoordinates.y - startCoordinates.y);
+        m = deltaY/deltaX;
+        // Error variable
+        let e = m-0.5;
+
+        // console.log( x + " |  " + y + " | " + e);
+
+        // Actually calculates the points
+        while(x < endCoordinates.x){
+            if(e>= 0){
+                y+=1;
+                e-=1;
+            }
+            x+=1;
+            e+=m;
+
+            // console.log( x + " |  " + y + " | " + e);
+
+            // push the results into the array
+            pixelsToPaint.push(x);
+            pixelsToPaint.push(y);
+        }
+
+        // Invert Reflection
+        this.invertReflection(pixelsToPaint,swapX,swapY,swapXY);
+        return pixelsToPaint;
+    }
+
+    static invertReflection(pixelsToSwap, swapX, swapY, swapXY){
+        for (let i =0; i< pixelsToSwap.length -1; i++){
+            if(swapY) {
+                pixelsToSwap[i] = (i % 2 == 0) ? pixelsToSwap[i] : -pixelsToSwap[i];
+            }
+            if(swapX) {
+                pixelsToSwap[i] = (i % 2 == 0) ? -pixelsToSwap[i] : pixelsToSwap[i];
+            }
+            if(swapXY) {
+                let aux =  pixelsToSwap[i];
+                pixelsToSwap[i] = pixelsToSwap[i+1];
+                pixelsToSwap[i+1] = aux;
+                i++;
+            }
+        }
+    }
+
+
+
+
+}
+
+module.exports = Algorithms;
+
+/***/ }),
+/* 5 */,
+/* 6 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (immutable) */ __webpack_exports__["a"] = clickableGrid;
 function clickableGrid( rows, cols, callback ){
     var grid = document.createElement('table');
     var x,y;
@@ -120,8 +363,6 @@ function clickableGrid( rows, cols, callback ){
     }
     return grid;
 }
-
-
 
 
 
