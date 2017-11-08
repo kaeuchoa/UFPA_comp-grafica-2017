@@ -2,7 +2,7 @@
 import clickableGrid from './classes/utils';
 let Color = require ('./classes/color');
 let FrameBuffer = require ('./classes/framebuffer');
-let Algorithms = require('./algorithms');
+let Algorithms = require('./classes/algorithms');
 
 // CONFIGS
 const WIDTH = 25;

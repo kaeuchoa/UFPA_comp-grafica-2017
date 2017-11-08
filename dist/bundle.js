@@ -292,9 +292,11 @@ class Algorithms{
         // Reflection
         if(m > 1 || m < -1 ){
             let aux = startCoordinates.x;
-            startCoordinates.x = startCoordinates.y, startCoordinates.y = aux;
+            startCoordinates.x = startCoordinates.y
+            startCoordinates.y = aux;
             aux = endCoordinates.x;
-            endCoordinates.x = endCoordinates.y, endCoordinates.y = aux;
+            endCoordinates.x = endCoordinates.y
+            endCoordinates.y = aux;
             swapXY = true;
         }
         if (startCoordinates.x > endCoordinates.x) {
@@ -307,6 +309,8 @@ class Algorithms{
             endCoordinates.y = -endCoordinates.y;
             swapY = true;
         }
+
+        console.log(swapXY,swapX,swapY);
         // Control variables
         let x = startCoordinates.x, y = startCoordinates.y;
         // Final Array that keeps all the coordinates found by the algorithm
@@ -331,38 +335,27 @@ class Algorithms{
             }
             x+=1;
             e+=m;
-
-            // console.log( x + " |  " + y + " | " + e);
-
             // push the results into the array
             pixelsToPaint.push(x);
             pixelsToPaint.push(y);
         }
 
         // Invert Reflection
-        this.invertReflection(pixelsToPaint,swapX,swapY,swapXY);
-        return pixelsToPaint;
-    }
 
-    static invertReflection(pixelsToSwap, swapX, swapY, swapXY){
-        for (let i =0; i< pixelsToSwap.length -1; i++){
-            if(swapY) {
-                pixelsToSwap[i] = (i % 2 == 0) ? pixelsToSwap[i] : -pixelsToSwap[i];
-            }
-            if(swapX) {
-                pixelsToSwap[i] = (i % 2 == 0) ? -pixelsToSwap[i] : pixelsToSwap[i];
-            }
-            if(swapXY) {
-                let aux =  pixelsToSwap[i];
-                pixelsToSwap[i] = pixelsToSwap[i+1];
-                pixelsToSwap[i+1] = aux;
+        for (let i=0; i< pixelsToPaint.length -1; i++) {
+            if (swapY)
+                pixelsToPaint[i] = (i % 2 == 0) ? pixelsToPaint[i] : -pixelsToPaint[i];
+            if (swapX)
+                pixelsToPaint[i] = (i % 2 == 0) ? -pixelsToPaint[i] : pixelsToPaint[i];
+            if (swapXY) {
+                let aux = pixelsToPaint[i];
+                pixelsToPaint[i] = pixelsToPaint[i + 1];
+                pixelsToPaint[i + 1] = aux;
                 i++;
             }
         }
+        return pixelsToPaint;
     }
-
-
-
 
 }
 
