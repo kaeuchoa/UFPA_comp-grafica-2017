@@ -1,45 +1,70 @@
-var Color = require ('./classes/color');
-var FrameBuffer = require ('./classes/framebuffer');
-var Algorithms = require('./algorithms');
-const WIDTH = 50;
-const HEIGHT = 50;
-let frameBuffer = new FrameBuffer(WIDTH,HEIGHT);
+// IMPORTS
+import clickableGrid from './classes/utils';
+let Color = require ('./classes/color');
+let FrameBuffer = require ('./classes/framebuffer');
+let Algorithms = require('./classes/algorithms');
 
-function paintCanvas(){
-    let canvas = document.getElementById('canvas');
-    let ctx = canvas.getContext('2d');
-    for (let i=0; i<frameBuffer.height; i++){
-        for (let j=0; j<frameBuffer.width; j++){
-            let size = frameBuffer.getPixel(j,i).size;
-            let padding = frameBuffer.getPixel(j,i).padding;
-            ctx.fillStyle = frameBuffer.getPixel(j,i).color.getStyle();
-            ctx.fillRect((frameBuffer.getPixel(j,i).x)*padding,(frameBuffer.getPixel(j,i).y)*padding,size,size);
+// CONFIGS
+const WIDTH = 25;
+const HEIGHT = 25;
+
+// Control variable
+let countClicks = 0;
+
+// Grid Related
+let frameBuffer = new FrameBuffer(WIDTH,HEIGHT);
+let startCoordinates = {};
+let endCoordinates = {};
+
+function paintPoints(){
+    for (let y=0; y<frameBuffer.height; y++){
+        for (let x=0; x<frameBuffer.width; x++){
+            let pixel = document.getElementById(x + "-" + y);
+            pixel.style.backgroundColor = frameBuffer.getPixel(x,y).color.getRGB();
+
         }
     }
 }
 
-paintCanvas();
+var grid = clickableGrid(HEIGHT,WIDTH,function(el,x,y){
+    console.log("You clicked on element:",el);
+    // console.log("You clicked on item #:",x,y);
 
-var btnBresenham = document.getElementById("btnBresenham");
-
-btnBresenham.onclick = function () {
-    console.log("Start Bresenham");
-    var startCoordinates = {
-        x: Number(document.getElementById("initialX").value),
-        y: Number(document.getElementById("initialY").value)
-    };
-
-    var endCoordinates = {
-        x: Number(document.getElementById("finalX").value),
-        y: Number(document.getElementById("finalY").value)
-    };
-    let pixelsToPaint = Algorithms.bresenham(startCoordinates,endCoordinates);
-    console.log("Finished Bresenham");
-    for (let i=0; i < pixelsToPaint.length -1 ; i+=2){
-        frameBuffer.getPixel(pixelsToPaint[i],pixelsToPaint[i+1]).color = new Color(200,0,0);
+    if(countClicks === 0){
+        countClicks++;
+        startCoordinates.x = x;
+        startCoordinates.y = y;
+    }else if(countClicks === 1){
+        endCoordinates.x = x;
+        endCoordinates.y = y;
+        // paint
+        // TODO: check which algorithm should be used
+        console.log("Started Bresenham");
+        let pixelsToPaint = Algorithms.bresenham(startCoordinates,endCoordinates);
+        console.log(pixelsToPaint);
+        console.log("Finished Bresenham");
+        for (let i=0; i < pixelsToPaint.length -1 ; i+=2){
+            frameBuffer.getPixel(pixelsToPaint[i],pixelsToPaint[i+1]).color = new Color(200,0,0);
+        }
+        paintPoints();
+        console.log(frameBuffer);
+        // reset
+        countClicks = 0;
+        startCoordinates = {};
+        endCoordinates = {};
     }
-    paintCanvas();
-};
+
+    el.className='clicked';
+    el.style.backgroundColor = "rgb(200,0,0)";
+
+
+    // let asd = document.getElementById(x + "-" + y);
+    // asd.style.backgroundColor = "blue";
+    // console.log("You clicked on element:",asd);
+});
+
+document.body.appendChild(grid);
+
 
 
 
