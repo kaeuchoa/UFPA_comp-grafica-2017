@@ -22,9 +22,7 @@ class FrameBuffer {
         return this.frameBuffer[y][x];
     }
 
-    setPixel(x,y,color){
-        this.frameBuffer[y][x];
-    }
+
 }
 
 module.exports = FrameBuffer;

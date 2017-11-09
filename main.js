@@ -5,8 +5,8 @@ let FrameBuffer = require ('./classes/framebuffer');
 let Algorithms = require('./classes/algorithms');
 
 // CONFIGS
-const WIDTH = 25;
-const HEIGHT = 25;
+const WIDTH = 100;
+const HEIGHT = 60;
 
 // Control variable
 let countClicks = 0;
@@ -28,7 +28,6 @@ function paintPoints(){
 
 var grid = clickableGrid(HEIGHT,WIDTH,function(el,x,y){
     console.log("You clicked on element:",el);
-    // console.log("You clicked on item #:",x,y);
 
     if(countClicks === 0){
         countClicks++;
@@ -41,13 +40,11 @@ var grid = clickableGrid(HEIGHT,WIDTH,function(el,x,y){
         // TODO: check which algorithm should be used
         console.log("Started Bresenham");
         let pixelsToPaint = Algorithms.bresenham(startCoordinates,endCoordinates);
-        console.log(pixelsToPaint);
         console.log("Finished Bresenham");
         for (let i=0; i < pixelsToPaint.length -1 ; i+=2){
             frameBuffer.getPixel(pixelsToPaint[i],pixelsToPaint[i+1]).color = new Color(200,0,0);
         }
         paintPoints();
-        console.log(frameBuffer);
         // reset
         countClicks = 0;
         startCoordinates = {};

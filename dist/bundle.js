@@ -105,8 +105,8 @@ let FrameBuffer = __webpack_require__ (3);
 let Algorithms = __webpack_require__(5);
 
 // CONFIGS
-const WIDTH = 25;
-const HEIGHT = 25;
+const WIDTH = 100;
+const HEIGHT = 60;
 
 // Control variable
 let countClicks = 0;
@@ -128,7 +128,6 @@ function paintPoints(){
 
 var grid = Object(__WEBPACK_IMPORTED_MODULE_0__classes_utils__["a" /* default */])(HEIGHT,WIDTH,function(el,x,y){
     console.log("You clicked on element:",el);
-    // console.log("You clicked on item #:",x,y);
 
     if(countClicks === 0){
         countClicks++;
@@ -141,13 +140,11 @@ var grid = Object(__WEBPACK_IMPORTED_MODULE_0__classes_utils__["a" /* default */
         // TODO: check which algorithm should be used
         console.log("Started Bresenham");
         let pixelsToPaint = Algorithms.bresenham(startCoordinates,endCoordinates);
-        console.log(pixelsToPaint);
         console.log("Finished Bresenham");
         for (let i=0; i < pixelsToPaint.length -1 ; i+=2){
             frameBuffer.getPixel(pixelsToPaint[i],pixelsToPaint[i+1]).color = new Color(200,0,0);
         }
         paintPoints();
-        console.log(frameBuffer);
         // reset
         countClicks = 0;
         startCoordinates = {};
@@ -228,9 +225,7 @@ class FrameBuffer {
         return this.frameBuffer[y][x];
     }
 
-    setPixel(x,y,color){
-        this.frameBuffer[y][x];
-    }
+
 }
 
 module.exports = FrameBuffer;
@@ -309,14 +304,9 @@ class Algorithms{
             endCoordinates.y = -endCoordinates.y;
             swapY = true;
         }
-
-        console.log(swapXY,swapX,swapY);
         // Control variables
         let x = startCoordinates.x, y = startCoordinates.y;
         // Final Array that keeps all the coordinates found by the algorithm
-
-        // console.log("x | y  | e");
-
         let pixelsToPaint = [x,y];
         // Calculates m after reflection stage
         deltaX = Math.abs(endCoordinates.x - startCoordinates.x);
@@ -324,8 +314,6 @@ class Algorithms{
         m = deltaY/deltaX;
         // Error variable
         let e = m-0.5;
-
-        // console.log( x + " |  " + y + " | " + e);
 
         // Actually calculates the points
         while(x < endCoordinates.x){
@@ -341,17 +329,18 @@ class Algorithms{
         }
 
         // Invert Reflection
-
-        for (let i=0; i< pixelsToPaint.length -1; i++) {
-            if (swapY)
-                pixelsToPaint[i] = (i % 2 == 0) ? pixelsToPaint[i] : -pixelsToPaint[i];
+        for (let i=0; i< pixelsToPaint.length -1; i+=2) {
+            if (swapY) {
+                pixelsToPaint[i+1] =  -pixelsToPaint[i+1];
+            }
             if (swapX)
-                pixelsToPaint[i] = (i % 2 == 0) ? -pixelsToPaint[i] : pixelsToPaint[i];
+                pixelsToPaint[i] = -pixelsToPaint[i];
+
             if (swapXY) {
                 let aux = pixelsToPaint[i];
                 pixelsToPaint[i] = pixelsToPaint[i + 1];
                 pixelsToPaint[i + 1] = aux;
-                i++;
+
             }
         }
         return pixelsToPaint;

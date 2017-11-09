@@ -27,14 +27,9 @@ class Algorithms{
             endCoordinates.y = -endCoordinates.y;
             swapY = true;
         }
-
-        console.log(swapXY,swapX,swapY);
         // Control variables
         let x = startCoordinates.x, y = startCoordinates.y;
         // Final Array that keeps all the coordinates found by the algorithm
-
-        // console.log("x | y  | e");
-
         let pixelsToPaint = [x,y];
         // Calculates m after reflection stage
         deltaX = Math.abs(endCoordinates.x - startCoordinates.x);
@@ -42,8 +37,6 @@ class Algorithms{
         m = deltaY/deltaX;
         // Error variable
         let e = m-0.5;
-
-        // console.log( x + " |  " + y + " | " + e);
 
         // Actually calculates the points
         while(x < endCoordinates.x){
@@ -59,17 +52,18 @@ class Algorithms{
         }
 
         // Invert Reflection
-
-        for (let i=0; i< pixelsToPaint.length -1; i++) {
-            if (swapY)
-                pixelsToPaint[i] = (i % 2 == 0) ? pixelsToPaint[i] : -pixelsToPaint[i];
+        for (let i=0; i< pixelsToPaint.length -1; i+=2) {
+            if (swapY) {
+                pixelsToPaint[i+1] =  -pixelsToPaint[i+1];
+            }
             if (swapX)
-                pixelsToPaint[i] = (i % 2 == 0) ? -pixelsToPaint[i] : pixelsToPaint[i];
+                pixelsToPaint[i] = -pixelsToPaint[i];
+
             if (swapXY) {
                 let aux = pixelsToPaint[i];
                 pixelsToPaint[i] = pixelsToPaint[i + 1];
                 pixelsToPaint[i + 1] = aux;
-                i++;
+
             }
         }
         return pixelsToPaint;
