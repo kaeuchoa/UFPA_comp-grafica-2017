@@ -1,6 +1,7 @@
 class Algorithms{
 
     static bresenham(startCoordinates,endCoordinates){
+        console.log("Started Bresenham");
         // Flags to keep track of what's done in reflection stage
         let swapXY = false, swapX = false, swapY = false;
         // Calculates m before reflection stage
@@ -66,7 +67,60 @@ class Algorithms{
 
             }
         }
+        console.log("Finished Bresenham");
         return pixelsToPaint;
+    }
+
+    static midPointCircle(startCoordinates,endCoordinates){
+        console.log("Started Midpoint");
+        // (x1− x0)²+(y1− y0)²= r²
+        let radius = Math.pow((endCoordinates.x - startCoordinates.x),2)
+                        + Math.pow((endCoordinates.y - startCoordinates.y),2);
+        // value of ray
+        radius = Math.sqrt(radius);
+        // round value
+        radius = Math.round(radius);
+        let x = 0 , y = radius, p = 1 - radius;
+        let pixelsToPaint = [startCoordinates.x,startCoordinates.y + radius];
+        pixelsToPaint.push(startCoordinates.x, startCoordinates.y - radius);
+        pixelsToPaint.push(startCoordinates.x + radius, startCoordinates.y);
+        pixelsToPaint.push(startCoordinates.x - radius, startCoordinates.y);
+
+        while(x<y){
+            x++;
+            if(p<0)
+                p+=2*x+3;
+            else{
+                y--;
+                p+= 2*x - 2*y + 5;
+            }
+            // Reflections
+            // (x0 + x, y0 + y);
+            // (x0 - x, y0 + y);
+            // (x0 + x, y0 - y);
+            // (x0 - x, y0 - y);
+            // (x0 + y, y0 + x);
+            // (x0 - y, y0 + x);
+            // (x0 + y, y0 - x);
+            // (x0 - y, y0 - x);
+            pixelsToPaint.push(startCoordinates.x + x ,startCoordinates.y + y);
+            pixelsToPaint.push(startCoordinates.x - x ,startCoordinates.y + y);
+            pixelsToPaint.push(startCoordinates.x + x ,startCoordinates.y - y);
+            pixelsToPaint.push(startCoordinates.x - x ,startCoordinates.y - y);
+            pixelsToPaint.push(startCoordinates.x + y ,startCoordinates.y + x);
+            pixelsToPaint.push(startCoordinates.x - y ,startCoordinates.y + x);
+            pixelsToPaint.push(startCoordinates.x + y ,startCoordinates.y - x);
+            pixelsToPaint.push(startCoordinates.x - y ,startCoordinates.y - x);
+
+
+        }
+
+        // pixelsToPaint.push(endCoordinates.x,endCoordinates.y);
+        console.log("Finished Midpoint");
+
+        return pixelsToPaint;
+
+
     }
 
 }

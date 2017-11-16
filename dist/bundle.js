@@ -103,10 +103,13 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 let Color = __webpack_require__ (0);
 let FrameBuffer = __webpack_require__ (3);
 let Algorithms = __webpack_require__(5);
+let operation = null;
 
 // CONFIGS
 const WIDTH = 100;
 const HEIGHT = 60;
+const LINE_OPERATION = "line";
+const CIRCLE_OPERATION = "circle";
 
 // Control variable
 let countClicks = 0;
@@ -116,51 +119,63 @@ let frameBuffer = new FrameBuffer(WIDTH,HEIGHT);
 let startCoordinates = {};
 let endCoordinates = {};
 
+document.getElementById("line").onclick = function(){
+    operation = LINE_OPERATION;
+}
+
+document.getElementById("circle").onclick = function(){
+    operation = CIRCLE_OPERATION;
+}
+
+document.getElementById("clear").onclick = function(){
+    console.log("FrameBuffer Cleared");
+    frameBuffer = new FrameBuffer(WIDTH,HEIGHT);
+    paintPoints();
+}
+
 function paintPoints(){
     for (let y=0; y<frameBuffer.height; y++){
         for (let x=0; x<frameBuffer.width; x++){
             let pixel = document.getElementById(x + "-" + y);
             pixel.style.backgroundColor = frameBuffer.getPixel(x,y).color.getRGB();
-
         }
     }
 }
 
 var grid = Object(__WEBPACK_IMPORTED_MODULE_0__classes_utils__["a" /* default */])(HEIGHT,WIDTH,function(el,x,y){
     console.log("You clicked on element:",el);
+    if (operation === null) {
+        window.alert("Selecione uma ferramenta.");
+    }else{
 
-    if(countClicks === 0){
-        countClicks++;
-        startCoordinates.x = x;
-        startCoordinates.y = y;
-    }else if(countClicks === 1){
-        endCoordinates.x = x;
-        endCoordinates.y = y;
-        // paint
-        // TODO: check which algorithm should be used
-        console.log("Started Bresenham");
-        let pixelsToPaint = Algorithms.bresenham(startCoordinates,endCoordinates);
-        console.log("Finished Bresenham");
-        for (let i=0; i < pixelsToPaint.length -1 ; i+=2){
-            frameBuffer.getPixel(pixelsToPaint[i],pixelsToPaint[i+1]).color = new Color(200,0,0);
+        if (countClicks === 0) {
+            countClicks++;
+            startCoordinates.x = x;
+            startCoordinates.y = y;
+            el.style.backgroundColor = "rgb(255,0,0)";
+        } else if (countClicks === 1) {
+            endCoordinates.x = x;
+            endCoordinates.y = y;
+
+            let pixelsToPaint;
+            if (operation === LINE_OPERATION)
+                pixelsToPaint = Algorithms.bresenham(startCoordinates, endCoordinates);
+            else if (operation === CIRCLE_OPERATION)
+                pixelsToPaint = Algorithms.midPointCircle(startCoordinates,endCoordinates);
+
+            frameBuffer.pointsToFrameBuffer(pixelsToPaint);
+            paintPoints();
+            // reset
+            countClicks = 0;
+            startCoordinates = {};
+            endCoordinates = {};
         }
-        paintPoints();
-        // reset
-        countClicks = 0;
-        startCoordinates = {};
-        endCoordinates = {};
+
+
     }
-
-    el.className='clicked';
-    el.style.backgroundColor = "rgb(200,0,0)";
-
-
-    // let asd = document.getElementById(x + "-" + y);
-    // asd.style.backgroundColor = "blue";
-    // console.log("You clicked on element:",asd);
 });
 
-document.body.appendChild(grid);
+document.getElementById("grid").appendChild(grid);
 
 
 
@@ -175,7 +190,7 @@ document.body.appendChild(grid);
 "use strict";
 /* harmony export (immutable) */ __webpack_exports__["a"] = clickableGrid;
 function clickableGrid( rows, cols, callback ){
-    var grid = document.createElement('table');
+    var grid = document.getElementById('canvas');
     var x,y;
     grid.className = 'grid';
     for (var r=0;r<rows;++r){
@@ -224,6 +239,14 @@ class FrameBuffer {
     getPixel(x,y){
         return this.frameBuffer[y][x];
     }
+
+    pointsToFrameBuffer(pixelsToPaint){
+        for (let i=0; i < pixelsToPaint.length -1 ; i+=2){
+            this.getPixel(pixelsToPaint[i],pixelsToPaint[i+1]).color = new Color(0,0,200);
+        }
+    }
+
+
 
 
 }
@@ -278,6 +301,7 @@ module.exports = Pixel;
 class Algorithms{
 
     static bresenham(startCoordinates,endCoordinates){
+        console.log("Started Bresenham");
         // Flags to keep track of what's done in reflection stage
         let swapXY = false, swapX = false, swapY = false;
         // Calculates m before reflection stage
@@ -343,7 +367,60 @@ class Algorithms{
 
             }
         }
+        console.log("Finished Bresenham");
         return pixelsToPaint;
+    }
+
+    static midPointCircle(startCoordinates,endCoordinates){
+        console.log("Started Midpoint");
+        // (x1− x0)²+(y1− y0)²= r²
+        let radius = Math.pow((endCoordinates.x - startCoordinates.x),2)
+                        + Math.pow((endCoordinates.y - startCoordinates.y),2);
+        // value of ray
+        radius = Math.sqrt(radius);
+        // round value
+        radius = Math.round(radius);
+        let x = 0 , y = radius, p = 1 - radius;
+        let pixelsToPaint = [startCoordinates.x,startCoordinates.y + radius];
+        pixelsToPaint.push(startCoordinates.x, startCoordinates.y - radius);
+        pixelsToPaint.push(startCoordinates.x + radius, startCoordinates.y);
+        pixelsToPaint.push(startCoordinates.x - radius, startCoordinates.y);
+
+        while(x<y){
+            x++;
+            if(p<0)
+                p+=2*x+3;
+            else{
+                y--;
+                p+= 2*x - 2*y + 5;
+            }
+            // Reflections
+            // (x0 + x, y0 + y);
+            // (x0 - x, y0 + y);
+            // (x0 + x, y0 - y);
+            // (x0 - x, y0 - y);
+            // (x0 + y, y0 + x);
+            // (x0 - y, y0 + x);
+            // (x0 + y, y0 - x);
+            // (x0 - y, y0 - x);
+            pixelsToPaint.push(startCoordinates.x + x ,startCoordinates.y + y);
+            pixelsToPaint.push(startCoordinates.x - x ,startCoordinates.y + y);
+            pixelsToPaint.push(startCoordinates.x + x ,startCoordinates.y - y);
+            pixelsToPaint.push(startCoordinates.x - x ,startCoordinates.y - y);
+            pixelsToPaint.push(startCoordinates.x + y ,startCoordinates.y + x);
+            pixelsToPaint.push(startCoordinates.x - y ,startCoordinates.y + x);
+            pixelsToPaint.push(startCoordinates.x + y ,startCoordinates.y - x);
+            pixelsToPaint.push(startCoordinates.x - y ,startCoordinates.y - x);
+
+
+        }
+
+        // pixelsToPaint.push(endCoordinates.x,endCoordinates.y);
+        console.log("Finished Midpoint");
+
+        return pixelsToPaint;
+
+
     }
 
 }
