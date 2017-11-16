@@ -100,7 +100,6 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__classes_utils__ = __webpack_require__(2);
 // IMPORTS
 
-let Color = __webpack_require__ (0);
 let FrameBuffer = __webpack_require__ (3);
 let Algorithms = __webpack_require__(5);
 let operation = null;
@@ -132,6 +131,10 @@ document.getElementById("clear").onclick = function(){
     frameBuffer = new FrameBuffer(WIDTH,HEIGHT);
     paintPoints();
 }
+
+// TODO: http://jscolor.com/examples/ color picker
+let color = document.getElementById("colorValue").value;
+console.log("cor:" + color);
 
 function paintPoints(){
     for (let y=0; y<frameBuffer.height; y++){

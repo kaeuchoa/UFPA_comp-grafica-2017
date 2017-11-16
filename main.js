@@ -1,6 +1,5 @@
 // IMPORTS
 import clickableGrid from './classes/utils';
-let Color = require ('./classes/color');
 let FrameBuffer = require ('./classes/framebuffer');
 let Algorithms = require('./classes/algorithms');
 let operation = null;
@@ -32,6 +31,10 @@ document.getElementById("clear").onclick = function(){
     frameBuffer = new FrameBuffer(WIDTH,HEIGHT);
     paintPoints();
 }
+
+// TODO: http://jscolor.com/examples/ color picker
+let color = document.getElementById("colorValue").value;
+console.log("cor:" + color);
 
 function paintPoints(){
     for (let y=0; y<frameBuffer.height; y++){

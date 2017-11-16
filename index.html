@@ -1,38 +1,41 @@
 <!DOCTYPE html>
 <html>
-  <head>
+<head>
     <meta charset="utf-8">
     <title>Computação Gráfica 2017</title>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css" integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css"
+          integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M" crossorigin="anonymous">
     <link rel="stylesheet" href="css/main.css"/>
-  </head>
-  <body class="container">
-    <header class="row">
-      <h3>Ferramentas</h3>
-    </header>
-    <div class="row">
-      <button class="btn btn-primary" id="line" style="margin:6px">Linha</button>
-      <button class="btn btn-primary" id="circle" style="margin:6px">Círculo</button>
-    </div>
-    <div class="row" id="grid">
-      <table id="canvas"></table>
-    </div>
+    <script src="dist/jscolor.js"></script>
+</head>
+<body class="container">
+<header class="row">
+    <h3>Ferramentas</h3>
+    <hr>
 
-    <div class="row">
-      <div class="col">
+</header>
+<div class="row">
+    <button class="btn btn-primary" id="line">Linha</button>
+    <button class="btn btn-primary" id="circle" style="margin:6px">Círculo</button>
+</div>
+
+<div class="row">
+        <button class="btn btn-primary jscolor {valueElement:'valueInput', styleElement:'styleInput'}" type="button">
+            Escolha uma cor
+        </button>
+        <input id="styleInput" class="form-control w-25" style="margin-left:6px" disabled>
+        <input id="colorValue" value="007bff" hidden>
+</div>
+<div class="row" id="grid">
+    <table id="canvas"></table>
+</div>
+
+<div class="row">
+    <div class="col">
         <button class="btn btn-danger float-right" id="clear">Limpar</button>
-      </div>
     </div>
+</div>
+</body>
 
-
-
-
-
-
-
-
-  </body>
-
-
-  <script src="./dist/bundle.js"></script>
+<script src="./dist/bundle.js"></script>
 </html>
