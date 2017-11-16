@@ -1,5 +1,5 @@
 export default function clickableGrid( rows, cols, callback ){
-    var grid = document.createElement('table');
+    var grid = document.getElementById('canvas');
     var x,y;
     grid.className = 'grid';
     for (var r=0;r<rows;++r){
