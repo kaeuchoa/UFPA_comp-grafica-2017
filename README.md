@@ -5,6 +5,7 @@ Repositório para códigos feitos na disciplina de computação gráfica durante
 Contém os seguintes algoritmos:
 <ul>
   <li>Algoritmo de Bresenham</li>
+  <li>Algoritmo do Ponto Médio para círculos</li>
  </ul>
 
 _______________________________________________________________________________
@@ -16,4 +17,5 @@ Repository to codes done to Computer Graphics Course during 2017.4 period at UFP
 Current algorithms implemented:
 <ul>
   <li>Bresenham Algorithm</li>
+  <li>Midpoint Algorithm for circles</li>
  </ul>
