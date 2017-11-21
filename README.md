@@ -6,6 +6,7 @@ Contém os seguintes algoritmos:
 <ul>
   <li>Algoritmo de Bresenham</li>
   <li>Algoritmo do Ponto Médio para círculos</li>
+  <li>Algoritmo de Preenchimento por Inundação</li> 
  </ul>
 
 _______________________________________________________________________________
@@ -18,4 +19,5 @@ Current algorithms implemented:
 <ul>
   <li>Bresenham Algorithm</li>
   <li>Midpoint Algorithm for circles</li>
+  <li>Floodfill Algorithm for painting</li>
  </ul>
