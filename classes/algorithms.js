@@ -1,5 +1,5 @@
 class Algorithms{
-
+    // TODO: make operations directly on framebuffer
     static bresenham(startCoordinates,endCoordinates){
         console.log("Started Bresenham");
         // Flags to keep track of what's done in reflection stage
@@ -121,6 +121,19 @@ class Algorithms{
         return pixelsToPaint;
 
 
+    }
+
+    static floodFill(x,y,frameBuffer,color,edgeColor){
+        console.log("Started FloodFill");
+        let current = frameBuffer.getPixel(x,y);
+        if(current.color.getRGB() !== edgeColor.getRGB() && current.color.getRGB() !== color.getRGB()){
+            frameBuffer.getPixel(x,y).color = color;
+            Algorithms.floodFill(x+1,y,frameBuffer,color,edgeColor);
+            Algorithms.floodFill(x,y+1,frameBuffer,color,edgeColor);
+            Algorithms.floodFill(x-1,y,frameBuffer,color,edgeColor);
+            Algorithms.floodFill(x,y-1,frameBuffer,color,edgeColor);
+        }
+        console.log("Finished FloodFill");
     }
 
 }
