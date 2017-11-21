@@ -1,8 +1,12 @@
-.grid { margin:1em auto; border-collapse:collapse }
+.grid {
+    margin:1em auto; border-collapse:collapse;
+    border:1px solid #ccc;
+}
 .grid td {
     cursor:pointer;
-    width:10px; height:10px;
-    border:1px solid #ccc;
+    width:10px;
+    height:10px;
+    /*border:1px solid #ccc;*/
 }
 
 #line{
