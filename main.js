@@ -3,7 +3,8 @@ import clickableGrid from './classes/utils';
 let FrameBuffer = require ('./classes/framebuffer');
 let Algorithms = require('./classes/algorithms');
 let Color = require("./classes/color");
-let operation = null;
+let VertexTable = require("./classes/vertextable");
+
 
 // FOR TESTING PURPOSES
 
@@ -16,9 +17,15 @@ const HEIGHT = bigGrid.height;
 const LINE_OPERATION = "line";
 const CIRCLE_OPERATION = "circle";
 const BUCKET_OPERATION = "bucket";
+// DEFAULT OPTION
+let operation = LINE_OPERATION;
 
 // Control variable
 let countClicks = 0;
+
+// Polygons description arrays
+let vertexTable = new VertexTable();
+
 
 // Grid Related
 let frameBuffer = new FrameBuffer(WIDTH,HEIGHT);
@@ -37,9 +44,24 @@ document.getElementById("bucket").onclick = function () {
     operation = BUCKET_OPERATION;
 }
 
+document.getElementById("fillPolygon").onclick = function () {
+    console.log("fill");
+    if (vertexTable.getNumberOfVertexes() >= 3){
+        vertexTable.buildEdgeTable();
+        console.log("before");
+        vertexTable.printEdgeTableToConsole();
+        vertexTable.sortEdgeTable();
+        console.log("after");
+        vertexTable.printEdgeTableToConsole();
+
+    }
+}
+
 document.getElementById("clear").onclick = function(){
     console.log("FrameBuffer Cleared");
+    console.log("Vertex Table Cleared");
     frameBuffer = new FrameBuffer(WIDTH,HEIGHT);
+    vertexTable = new VertexTable();
     paintPoints();
 }
 
@@ -57,11 +79,8 @@ function paintPoints(){
 }
 
 var grid = clickableGrid(HEIGHT,WIDTH,function(el,x,y){
-    console.log("You clicked on element:",el);
+    // console.log("You clicked on element:",el);
     let pixelsToPaint;
-    if (operation === null) {
-        window.alert("Selecione uma ferramenta.");
-    }else{
 
         if (countClicks === 0 && operation === BUCKET_OPERATION) {
             Algorithms.floodFill(x,y,frameBuffer,new Color(200,0,0),new Color(0,0,200));
@@ -70,11 +89,12 @@ var grid = clickableGrid(HEIGHT,WIDTH,function(el,x,y){
             countClicks++;
             startCoordinates.x = x;
             startCoordinates.y = y;
+            vertexTable.addVertex(x,y);
             el.style.backgroundColor = "rgb(255,0,0)";
         }else if (countClicks === 1) {
             endCoordinates.x = x;
             endCoordinates.y = y;
-
+            vertexTable.addVertex(x,y);
             if (operation === LINE_OPERATION)
                 pixelsToPaint = Algorithms.bresenham(startCoordinates, endCoordinates);
             else if (operation === CIRCLE_OPERATION)
@@ -89,7 +109,7 @@ var grid = clickableGrid(HEIGHT,WIDTH,function(el,x,y){
         }
 
 
-    }
+
 });
 
 document.getElementById("grid").appendChild(grid);

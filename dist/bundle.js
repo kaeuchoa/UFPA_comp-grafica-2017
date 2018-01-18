@@ -103,7 +103,8 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 let FrameBuffer = __webpack_require__ (3);
 let Algorithms = __webpack_require__(5);
 let Color = __webpack_require__(0);
-let operation = null;
+let VertexTable = __webpack_require__(6);
+
 
 // FOR TESTING PURPOSES
 
@@ -116,9 +117,15 @@ const HEIGHT = bigGrid.height;
 const LINE_OPERATION = "line";
 const CIRCLE_OPERATION = "circle";
 const BUCKET_OPERATION = "bucket";
+// DEFAULT OPTION
+let operation = LINE_OPERATION;
 
 // Control variable
 let countClicks = 0;
+
+// Polygons description arrays
+let vertexTable = new VertexTable();
+
 
 // Grid Related
 let frameBuffer = new FrameBuffer(WIDTH,HEIGHT);
@@ -137,9 +144,24 @@ document.getElementById("bucket").onclick = function () {
     operation = BUCKET_OPERATION;
 }
 
+document.getElementById("fillPolygon").onclick = function () {
+    console.log("fill");
+    if (vertexTable.getNumberOfVertexes() >= 3){
+        vertexTable.buildEdgeTable();
+        console.log("before");
+        vertexTable.printEdgeTableToConsole();
+        vertexTable.sortEdgeTable();
+        console.log("after");
+        vertexTable.printEdgeTableToConsole();
+
+    }
+}
+
 document.getElementById("clear").onclick = function(){
     console.log("FrameBuffer Cleared");
+    console.log("Vertex Table Cleared");
     frameBuffer = new FrameBuffer(WIDTH,HEIGHT);
+    vertexTable = new VertexTable();
     paintPoints();
 }
 
@@ -157,11 +179,8 @@ function paintPoints(){
 }
 
 var grid = Object(__WEBPACK_IMPORTED_MODULE_0__classes_utils__["a" /* default */])(HEIGHT,WIDTH,function(el,x,y){
-    console.log("You clicked on element:",el);
+    // console.log("You clicked on element:",el);
     let pixelsToPaint;
-    if (operation === null) {
-        window.alert("Selecione uma ferramenta.");
-    }else{
 
         if (countClicks === 0 && operation === BUCKET_OPERATION) {
             Algorithms.floodFill(x,y,frameBuffer,new Color(200,0,0),new Color(0,0,200));
@@ -170,11 +189,12 @@ var grid = Object(__WEBPACK_IMPORTED_MODULE_0__classes_utils__["a" /* default */
             countClicks++;
             startCoordinates.x = x;
             startCoordinates.y = y;
+            vertexTable.addVertex(x,y);
             el.style.backgroundColor = "rgb(255,0,0)";
         }else if (countClicks === 1) {
             endCoordinates.x = x;
             endCoordinates.y = y;
-
+            vertexTable.addVertex(x,y);
             if (operation === LINE_OPERATION)
                 pixelsToPaint = Algorithms.bresenham(startCoordinates, endCoordinates);
             else if (operation === CIRCLE_OPERATION)
@@ -189,7 +209,7 @@ var grid = Object(__WEBPACK_IMPORTED_MODULE_0__classes_utils__["a" /* default */
         }
 
 
-    }
+
 });
 
 document.getElementById("grid").appendChild(grid);
@@ -320,7 +340,7 @@ module.exports = Pixel;
 class Algorithms{
     // TODO: make operations directly on framebuffer
     static bresenham(startCoordinates,endCoordinates){
-        console.log("Started Bresenham");
+        // console.log("Started Bresenham");
         // Flags to keep track of what's done in reflection stage
         let swapXY = false, swapX = false, swapY = false;
         // Calculates m before reflection stage
@@ -386,12 +406,11 @@ class Algorithms{
 
             }
         }
-        console.log("Finished Bresenham");
+        // console.log("Finished Bresenham");
         return pixelsToPaint;
     }
 
     static midPointCircle(startCoordinates,endCoordinates){
-        console.log("Started Midpoint");
         // (x1− x0)²+(y1− y0)²= r²
         let radius = Math.pow((endCoordinates.x - startCoordinates.x),2)
                         + Math.pow((endCoordinates.y - startCoordinates.y),2);
@@ -434,16 +453,12 @@ class Algorithms{
 
         }
 
-        // pixelsToPaint.push(endCoordinates.x,endCoordinates.y);
-        console.log("Finished Midpoint");
-
         return pixelsToPaint;
 
 
     }
 
     static floodFill(x,y,frameBuffer,color,edgeColor){
-        console.log("Started FloodFill");
         let current = frameBuffer.getPixel(x,y);
         if(current.color.getRGB() !== edgeColor.getRGB() && current.color.getRGB() !== color.getRGB()){
             frameBuffer.getPixel(x,y).color = color;
@@ -452,12 +467,135 @@ class Algorithms{
             Algorithms.floodFill(x-1,y,frameBuffer,color,edgeColor);
             Algorithms.floodFill(x,y-1,frameBuffer,color,edgeColor);
         }
-        console.log("Finished FloodFill");
+    }
+
+    static scanlineFill(){
+
     }
 
 }
 
 module.exports = Algorithms;
+
+/***/ }),
+/* 6 */
+/***/ (function(module, exports) {
+
+class VertexTable {
+
+    constructor() {
+        // guarda os vértices
+        this.vertexTable = [];
+        // guarda as bordas do polígono (chamada de global após ordenação)
+        this.edgeTable = [];
+    }
+
+    addVertex(xCoord, yCoord) {
+        if (this.vertexTable.length === 0) {
+            this.vertexTable.push({x: xCoord, y: yCoord});
+        } else {
+            let containsFlag = false;
+            for (let i = 0; i < this.vertexTable.length; i++) {
+                let row = this.vertexTable[i];
+                if ((row.x === xCoord && row.y === yCoord)) {
+                    containsFlag = true;
+                    break;
+                }
+            }
+            if (!containsFlag)
+                this.vertexTable.push({x: xCoord, y: yCoord});
+        }
+    }
+
+
+    printVertexToConsole() {
+        console.log("X\tY");
+        for (let i = 0; i < this.vertexTable.length; i++) {
+            console.log(this.vertexTable[i].x + "\t" + this.vertexTable[i].y);
+        }
+    }
+
+    findMaxY(i) {
+        if (this.vertexTable[i].y > this.vertexTable[i + 1].y)
+            return this.vertexTable[i].y;
+        else
+            return this.vertexTable[i + 1].y;
+    }
+
+    findMinY(i) {
+        if (this.vertexTable[i].y < this.vertexTable[i + 1].y)
+            return this.vertexTable[i].y;
+        else
+            return this.vertexTable[i + 1].y;
+    }
+
+    // Tabela dos lados
+    // slope = inclinação da reta
+    buildEdgeTable() {
+        for (let i = 0; i < this.vertexTable.length - 1; i++) {
+            this.edgeTable.push({
+                yMin: this.findMinY(i),
+                yMax: this.findMaxY(i),
+                xyMin: this.vertexTable[i].x,
+                slope: this.findSlope(i)
+            });
+        }
+    }
+
+    printEdgeTableToConsole(){
+        console.log("yMin\tyMax\txyMin\tslope");
+        for(let i = 0; i< this.edgeTable.length; i++){
+            console.log(this.edgeTable[i].yMin+"\t\t"+this.edgeTable[i].yMax+"\t\t"+this.edgeTable[i].xyMin+"\t\t"+this.edgeTable[i].slope);
+        }
+    }
+
+    findSlope(i) {
+        let dy = this.vertexTable[i + 1].y - this.vertexTable[i].y;
+        let dx = this.vertexTable[i + 1].x - this.vertexTable[i].x;
+        let slope;
+        if (dy === 0)
+            slope = 1;
+        if (dx === 0)
+            slope = 0;
+        if ((dy !== 0) && (dx !== 0)) /*- calculate inverse slope -*/
+            slope = dx / dy;
+        return slope;
+    }
+
+    getNumberOfVertexes() {
+        return this.vertexTable.length;
+    }
+
+    // produz a global table
+    sortEdgeTable() {
+        let swap;
+        // A. yMin[i] > yMin [i+1]
+        // B. yMax[i] > yMax [i+1]
+        // C. yMin[i] == yMin[i+1]
+        // D. xyMin[i] > xyMin [i+1]
+        for (let i = 0; i < this.edgeTable.length - 1; i++) {
+            for (let j = 0; j< (this.edgeTable.length -1);j++){
+                // condições
+                let A = this.edgeTable[j].yMin > this.edgeTable[j + 1].yMin;
+                let B = this.edgeTable[j].yMax > this.edgeTable[j + 1].yMax;
+                let C = this.edgeTable[j].yMin === this.edgeTable[j+1].yMin;
+                let D = this.edgeTable[j].xyMin > this.edgeTable[j+1].xyMin;
+                if ((A || B) || (C && D)){
+                    swap = this.edgeTable[j];
+                    this.edgeTable[j] = this.edgeTable[j+1];
+                    this.edgeTable[j+1] = swap;
+                }
+            }
+        }
+    }
+
+
+
+
+
+}
+
+module.exports = VertexTable;
 
 /***/ })
 /******/ ]);

@@ -1,7 +1,7 @@
 class Algorithms{
     // TODO: make operations directly on framebuffer
     static bresenham(startCoordinates,endCoordinates){
-        console.log("Started Bresenham");
+        // console.log("Started Bresenham");
         // Flags to keep track of what's done in reflection stage
         let swapXY = false, swapX = false, swapY = false;
         // Calculates m before reflection stage
@@ -67,12 +67,11 @@ class Algorithms{
 
             }
         }
-        console.log("Finished Bresenham");
+        // console.log("Finished Bresenham");
         return pixelsToPaint;
     }
 
     static midPointCircle(startCoordinates,endCoordinates){
-        console.log("Started Midpoint");
         // (x1− x0)²+(y1− y0)²= r²
         let radius = Math.pow((endCoordinates.x - startCoordinates.x),2)
                         + Math.pow((endCoordinates.y - startCoordinates.y),2);
@@ -115,16 +114,12 @@ class Algorithms{
 
         }
 
-        // pixelsToPaint.push(endCoordinates.x,endCoordinates.y);
-        console.log("Finished Midpoint");
-
         return pixelsToPaint;
 
 
     }
 
     static floodFill(x,y,frameBuffer,color,edgeColor){
-        console.log("Started FloodFill");
         let current = frameBuffer.getPixel(x,y);
         if(current.color.getRGB() !== edgeColor.getRGB() && current.color.getRGB() !== color.getRGB()){
             frameBuffer.getPixel(x,y).color = color;
@@ -133,7 +128,10 @@ class Algorithms{
             Algorithms.floodFill(x-1,y,frameBuffer,color,edgeColor);
             Algorithms.floodFill(x,y-1,frameBuffer,color,edgeColor);
         }
-        console.log("Finished FloodFill");
+    }
+
+    static scanlineFill(){
+
     }
 
 }
