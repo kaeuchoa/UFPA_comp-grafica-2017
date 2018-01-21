@@ -146,15 +146,19 @@ document.getElementById("bucket").onclick = function () {
 
 document.getElementById("fillPolygon").onclick = function () {
     console.log("fill");
-    if (vertexTable.getNumberOfVertexes() >= 3){
-        vertexTable.buildEdgeTable();
-        console.log("before");
-        vertexTable.printEdgeTableToConsole();
-        vertexTable.sortEdgeTable();
-        console.log("after");
-        vertexTable.printEdgeTableToConsole();
-
-    }
+    vertexTable.addVertex(12,12);
+    vertexTable.addVertex(12,18);
+    vertexTable.addVertex(18,22);
+    vertexTable.addVertex(30,12);
+    vertexTable.addVertex(30,18);
+    vertexTable.addVertex(24,12);
+    Algorithms.scanlineFill(vertexTable);
+    // vertexTable.printVertexToConsole();
+    // vertexTable.printEdgeTableToConsole();
+    // if (vertexTable.getNumberOfVertexes() >= 3){
+    //     Algorithms.scanlineFill(vertexTable);
+    //
+    // }
 }
 
 document.getElementById("clear").onclick = function(){
@@ -469,7 +473,18 @@ class Algorithms{
         }
     }
 
-    static scanlineFill(){
+    static scanlineFill(vertexTable){
+
+        // Int [][] a: two dimensional array to store the polygon vertices.
+        // Int [][] b : two dimensional array to store the Edges-Table.
+        // float [][] cc : two dimensional array to store the Active-Table.
+        // float [][] ccc : two dimensional array to store the updated Active-Table.
+        // float [] slop : one dimensional array to store the slop.
+        // double [][] drawline : two dimensional array to store the drawing points
+        vertexTable.buildEdgeTable();
+        vertexTable.sortEdgeTable();
+        let scanline = vertexTable.edgeTable[0].yMin;
+
 
     }
 
@@ -488,6 +503,7 @@ class VertexTable {
         this.vertexTable = [];
         // guarda as bordas do polígono (chamada de global após ordenação)
         this.edgeTable = [];
+        this.activeTable = [];
     }
 
     addVertex(xCoord, yCoord) {
@@ -507,13 +523,14 @@ class VertexTable {
         }
     }
 
-
     printVertexToConsole() {
         console.log("X\tY");
         for (let i = 0; i < this.vertexTable.length; i++) {
             console.log(this.vertexTable[i].x + "\t" + this.vertexTable[i].y);
         }
     }
+
+
 
     findMaxY(i) {
         if (this.vertexTable[i].y > this.vertexTable[i + 1].y)
@@ -539,6 +556,14 @@ class VertexTable {
                 xyMin: this.vertexTable[i].x,
                 slope: this.findSlope(i)
             });
+            if(i+1 === (this.vertexTable.length -1)){
+                this.edgeTable.push({
+                    yMin: this.findMinY(0),
+                    yMax: this.findMaxY(0),
+                    xyMin: this.vertexTable[0].y,
+                    slope: this.findSlope(0)
+                });
+            }
         }
     }
 
@@ -585,6 +610,19 @@ class VertexTable {
                     this.edgeTable[j] = this.edgeTable[j+1];
                     this.edgeTable[j+1] = swap;
                 }
+            }
+        }
+    }
+
+    buildActiveTable(){
+        let scanline = this.edgeTable[0].yMin;
+        for(let i=0; i<this.edgeTable.length;i++){
+            if(this.edgeTable[i].yMin === scanline) {
+                this.activeTable.push({
+                    yMax: this.edgeTable[i].yMax,
+                    xyMin: this.edgeTable[i].xyMin,
+                    slope: this.edgeTable[i].slope
+                });
             }
         }
     }

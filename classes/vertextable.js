@@ -5,6 +5,7 @@ class VertexTable {
         this.vertexTable = [];
         // guarda as bordas do polígono (chamada de global após ordenação)
         this.edgeTable = [];
+        this.activeTable = [];
     }
 
     addVertex(xCoord, yCoord) {
@@ -24,13 +25,14 @@ class VertexTable {
         }
     }
 
-
     printVertexToConsole() {
         console.log("X\tY");
         for (let i = 0; i < this.vertexTable.length; i++) {
             console.log(this.vertexTable[i].x + "\t" + this.vertexTable[i].y);
         }
     }
+
+
 
     findMaxY(i) {
         if (this.vertexTable[i].y > this.vertexTable[i + 1].y)
@@ -56,6 +58,14 @@ class VertexTable {
                 xyMin: this.vertexTable[i].x,
                 slope: this.findSlope(i)
             });
+            if(i+1 === (this.vertexTable.length -1)){
+                this.edgeTable.push({
+                    yMin: this.findMinY(0),
+                    yMax: this.findMaxY(0),
+                    xyMin: this.vertexTable[0].y,
+                    slope: this.findSlope(0)
+                });
+            }
         }
     }
 
@@ -102,6 +112,19 @@ class VertexTable {
                     this.edgeTable[j] = this.edgeTable[j+1];
                     this.edgeTable[j+1] = swap;
                 }
+            }
+        }
+    }
+
+    buildActiveTable(){
+        let scanline = this.edgeTable[0].yMin;
+        for(let i=0; i<this.edgeTable.length;i++){
+            if(this.edgeTable[i].yMin === scanline) {
+                this.activeTable.push({
+                    yMax: this.edgeTable[i].yMax,
+                    xyMin: this.edgeTable[i].xyMin,
+                    slope: this.edgeTable[i].slope
+                });
             }
         }
     }

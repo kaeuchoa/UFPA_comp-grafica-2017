@@ -46,15 +46,19 @@ document.getElementById("bucket").onclick = function () {
 
 document.getElementById("fillPolygon").onclick = function () {
     console.log("fill");
-    if (vertexTable.getNumberOfVertexes() >= 3){
-        vertexTable.buildEdgeTable();
-        console.log("before");
-        vertexTable.printEdgeTableToConsole();
-        vertexTable.sortEdgeTable();
-        console.log("after");
-        vertexTable.printEdgeTableToConsole();
-
-    }
+    vertexTable.addVertex(12,12);
+    vertexTable.addVertex(12,18);
+    vertexTable.addVertex(18,22);
+    vertexTable.addVertex(30,12);
+    vertexTable.addVertex(30,18);
+    vertexTable.addVertex(24,12);
+    Algorithms.scanlineFill(vertexTable);
+    // vertexTable.printVertexToConsole();
+    // vertexTable.printEdgeTableToConsole();
+    // if (vertexTable.getNumberOfVertexes() >= 3){
+    //     Algorithms.scanlineFill(vertexTable);
+    //
+    // }
 }
 
 document.getElementById("clear").onclick = function(){

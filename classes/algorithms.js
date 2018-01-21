@@ -130,7 +130,18 @@ class Algorithms{
         }
     }
 
-    static scanlineFill(){
+    static scanlineFill(vertexTable){
+
+        // Int [][] a: two dimensional array to store the polygon vertices.
+        // Int [][] b : two dimensional array to store the Edges-Table.
+        // float [][] cc : two dimensional array to store the Active-Table.
+        // float [][] ccc : two dimensional array to store the updated Active-Table.
+        // float [] slop : one dimensional array to store the slop.
+        // double [][] drawline : two dimensional array to store the drawing points
+        vertexTable.buildEdgeTable();
+        vertexTable.sortEdgeTable();
+        let scanline = vertexTable.edgeTable[0].yMin;
+
 
     }
 
