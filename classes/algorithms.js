@@ -1,6 +1,10 @@
+var Pixel = require('./pixel');
+var Color = require('./color');
+var FrameBuffer = require('./framebuffer');
+
 class Algorithms{
     // TODO: make operations directly on framebuffer
-    static bresenham(startCoordinates,endCoordinates){
+    static bresenham(startCoordinates,endCoordinates,framebuffer){
         // console.log("Started Bresenham");
         // Flags to keep track of what's done in reflection stage
         let swapXY = false, swapX = false, swapY = false;
@@ -144,6 +148,22 @@ class Algorithms{
 
 
     }
+
+    static translation(framebuffer,moveX,moveY) {
+
+        let translatedBuffer = new FrameBuffer(framebuffer.width, framebuffer.height);
+        for (let y = 0; y < framebuffer.height; y++) {
+            for (let x = 0; x < framebuffer.width; x++) {
+                let pixel = framebuffer.getPixel(x, y);
+                if (pixel.getColor().getRGB() !== framebuffer.getBaseColor().getRGB()) {
+                    translatedBuffer.setPixel(x + moveX, y + moveY, pixel);
+                }
+            }
+        }
+
+        return translatedBuffer;
+    }
+
 
 }
 

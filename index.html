@@ -7,27 +7,81 @@
           integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M" crossorigin="anonymous">
     <link rel="stylesheet" href="css/main.css"/>
     <script src="dist/jscolor.js"></script>
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+            integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+            crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+            integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+            crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+            integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+            crossorigin="anonymous"></script>
 </head>
 <body class="container">
+<div id="bgpanel" class="invisible">
+    <div id="translation-panel" class="invisible">
+        <div class="form-group">
+            <h6>Translação - Indique os valores para:</h6>
+            <label for="translation-x">Mover horizontalmente (px):</label>
+            <input type="number" step="1" class="form-control" id="translation-x"/>
+            <label for="translation-y">Mover em verticalmente (px):</label>
+            <input type="number" step="1" class="form-control" id="translation-y"/>
+
+        </div>
+        <div class="row float-right">
+            <button type="button" class="btn btn-danger" id="translation-cancel">Cancelar</button>
+            <button type="button" class="btn btn-success" id="translation-ok">OK</button>
+        </div>
+    </div>
+</div>
+
 <header class="row">
     <h3>Ferramentas</h3>
     <hr>
-
 </header>
+
+<div class="row">
+    <h6>Desenho</h6>
+</div>
 <div class="row">
     <button class="btn btn-primary" id="line">Linha</button>
-    <button class="btn btn-primary" id="circle" style="margin:6px">Círculo</button>
-    <button class="btn btn-primary" id="bucket" style="margin: 6px">Preenchimento Rec.</button>
-    <button class="btn btn-primary" id="fillPolygon" style="margin: 6px">Preencher Forma</button>
+    <button class="btn btn-primary" id="circle">Círculo</button>
 </div>
 
 <div class="row">
-        <button class="btn btn-primary jscolor {valueElement:'valueInput', styleElement:'styleInput'}" type="button">
-            Escolha uma cor
-        </button>
-        <input id="styleInput" class="form-control w-25" style="margin-left:6px" disabled>
-        <input id="colorValue" value="007bff" hidden>
+    <h6>Preenchimento</h6>
 </div>
+<div class="row">
+    <button class="btn btn-primary" id="bucket">Preenchimento Recursivo</button>
+    <button class="btn btn-primary" id="fillPolygon">Preenchimento por Varredura</button>
+    <button class="btn btn-primary jscolor {valueElement:'valueInput', styleElement:'styleInput'}" type="button">
+        Escolha uma cor
+    </button>
+    <div id="styleInput" class="form-control" style="margin:6px;width:60px"></div>
+    <input id="colorValue" value="007bff" hidden>
+</div>
+
+<div class="row">
+    <h6>Transformação</h6>
+</div>
+<div class="row">
+    <div class="dropdown">
+        <button class="btn btn-primary dropdown-toggle" type="button" id="rotation" data-toggle="dropdown"
+                aria-haspopup="true" aria-expanded="false">
+            Rotação
+        </button>
+        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+            <a class="dropdown-item" href="#">Rotação 90° p/ direita</a>
+            <a class="dropdown-item" href="#">Rotação 90° p/ esquerda</a>
+            <a class="dropdown-item" href="#">Rotação 180°</a>
+            <a class="dropdown-item" href="#">Refletir horizontalmente</a>
+            <a class="dropdown-item" href="#">Refletir verticalmente</a>
+        </div>
+    </div>
+    <button class="btn btn-primary" id="translation">Translação</button>
+    <button class="btn btn-primary" id="scale">Escala</button>
+</div>
+
 <div class="row" id="grid">
     <table id="canvas"></table>
 </div>

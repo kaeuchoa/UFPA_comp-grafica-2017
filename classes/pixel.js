@@ -2,34 +2,25 @@ const color = require ('./color')
 
 class Pixel{
     constructor(x,y,color){
-        this._size = 10;
-        this._padding = this.size * 1.3;
-        this._x = x;
-        this._y = y;
-        this._color = color;
-    }
-    get size() {
-        return this._size;
+        this.size = 10;
+        this.padding = this.size * 1.3;
+        this.x = x;
+        this.y = y;
+        this.color = color;
     }
 
-    get padding() {
-        return this._padding;
+    getColor(){
+        return this.color;
     }
 
-    get x() {
-        return this._x;
+    setX(x){
+        this.x = x;
     }
 
-    get y() {
-        return this._y;
+    setY(y){
+        this.y = y;
     }
 
-    get color() {
-        return this._color;
-    }
-    set color(color) {
-        this._color = color;
-    }
 
 }
 

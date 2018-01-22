@@ -82,6 +82,11 @@ class Color {
         return "rgb("+ this.r +  "," + this.g + "," + this.b + ")"
     }
 
+    isEqual(color){
+        if(this.r === color.r && this.g === color.g && this.b === color.b)
+            return true;
+    }
+
     setColor(r,g,b){
         this.r = r;
         this.g = g;
@@ -108,7 +113,7 @@ let VertexTable = __webpack_require__(6);
 
 // FOR TESTING PURPOSES
 
-let smallGrid = {width:10,height:10};
+let smallGrid = {width:7,height:7};
 let bigGrid = {width:120,height:60};
 
 // CONFIGS
@@ -126,11 +131,44 @@ let countClicks = 0;
 // Polygons description arrays
 let vertexTable = new VertexTable();
 
-
 // Grid Related
 let frameBuffer = new FrameBuffer(WIDTH,HEIGHT);
 let startCoordinates = {};
 let endCoordinates = {};
+
+var grid = Object(__WEBPACK_IMPORTED_MODULE_0__classes_utils__["a" /* default */])(HEIGHT,WIDTH,function(el,x,y){
+    // console.log("You clicked on element:",el);
+    let pixelsToPaint;
+    // Preenchimento recursivo
+    if (countClicks === 0 && operation === BUCKET_OPERATION) {
+        Algorithms.floodFill(x,y,frameBuffer,new Color(200,0,0),new Color(0,0,0));
+        paintPoints();
+    }else if(countClicks === 0 && operation !== BUCKET_OPERATION) {
+        countClicks++;
+        startCoordinates.x = x;
+        startCoordinates.y = y;
+        // vertexTable.addVertex(x,y);
+        el.style.backgroundColor = "rgb(255,0,0)";
+    }else if (countClicks === 1) {
+        endCoordinates.x = x;
+        endCoordinates.y = y;
+        // vertexTable.addVertex(x,y);
+        if (operation === LINE_OPERATION)
+            pixelsToPaint = Algorithms.bresenham(startCoordinates, endCoordinates);
+        else if (operation === CIRCLE_OPERATION)
+            pixelsToPaint = Algorithms.midPointCircle(startCoordinates,endCoordinates);
+
+        frameBuffer.pointsToFrameBuffer(pixelsToPaint);
+        paintPoints();
+        // reset
+        countClicks = 0;
+        startCoordinates = {};
+        endCoordinates = {};
+    }
+});
+
+document.getElementById("grid").appendChild(grid);
+
 
 document.getElementById("line").onclick = function(){
     operation = LINE_OPERATION;
@@ -144,34 +182,40 @@ document.getElementById("bucket").onclick = function () {
     operation = BUCKET_OPERATION;
 }
 
-document.getElementById("fillPolygon").onclick = function () {
-    console.log("fill");
-    vertexTable.addVertex(12,12);
-    vertexTable.addVertex(12,18);
-    vertexTable.addVertex(18,22);
-    vertexTable.addVertex(30,12);
-    vertexTable.addVertex(30,18);
-    vertexTable.addVertex(24,12);
-    Algorithms.scanlineFill(vertexTable);
-    // vertexTable.printVertexToConsole();
-    // vertexTable.printEdgeTableToConsole();
-    // if (vertexTable.getNumberOfVertexes() >= 3){
-    //     Algorithms.scanlineFill(vertexTable);
-    //
-    // }
+document.getElementById("translation").onclick = function () {
+    openTranslationWindow();
 }
 
+// document.getElementById("bgpanel").onclick = function () {
+//     document.getElementById("bgpanel").classList.toggle("invisible");
+// }
+
+// document.getElementById("fillPolygon").onclick = function () {
+//     console.log("fill");
+//     vertexTable.addVertex(12,12);
+//     vertexTable.addVertex(12,18);
+//     vertexTable.addVertex(18,22);
+//     vertexTable.addVertex(30,12);
+//     vertexTable.addVertex(30,18);
+//     vertexTable.addVertex(24,12);
+//     Algorithms.scanlineFill(vertexTable);
+//     // vertexTable.printVertexToConsole();
+//     // vertexTable.printEdgeTableToConsole();
+//     // if (vertexTable.getNumberOfVertexes() >= 3){
+//     //     Algorithms.scanlineFill(vertexTable);
+//     //
+//     // }
+// }
+
 document.getElementById("clear").onclick = function(){
-    console.log("FrameBuffer Cleared");
-    console.log("Vertex Table Cleared");
     frameBuffer = new FrameBuffer(WIDTH,HEIGHT);
     vertexTable = new VertexTable();
     paintPoints();
 }
 
-// TODO: http://jscolor.com/examples/ color picker
-let color = document.getElementById("colorValue").value;
-console.log("cor:" + color);
+// // TODO: http://jscolor.com/examples/ color picker
+// let color = document.getElementById("colorValue").value;
+// console.log("cor:" + color);
 
 function paintPoints(){
     for (let y=0; y<frameBuffer.height; y++){
@@ -182,41 +226,36 @@ function paintPoints(){
     }
 }
 
-var grid = Object(__WEBPACK_IMPORTED_MODULE_0__classes_utils__["a" /* default */])(HEIGHT,WIDTH,function(el,x,y){
-    // console.log("You clicked on element:",el);
-    let pixelsToPaint;
 
-        if (countClicks === 0 && operation === BUCKET_OPERATION) {
-            Algorithms.floodFill(x,y,frameBuffer,new Color(200,0,0),new Color(0,0,200));
-            paintPoints();
-        }else if(countClicks === 0 && operation !== BUCKET_OPERATION) {
-            countClicks++;
-            startCoordinates.x = x;
-            startCoordinates.y = y;
-            vertexTable.addVertex(x,y);
-            el.style.backgroundColor = "rgb(255,0,0)";
-        }else if (countClicks === 1) {
-            endCoordinates.x = x;
-            endCoordinates.y = y;
-            vertexTable.addVertex(x,y);
-            if (operation === LINE_OPERATION)
-                pixelsToPaint = Algorithms.bresenham(startCoordinates, endCoordinates);
-            else if (operation === CIRCLE_OPERATION)
-                pixelsToPaint = Algorithms.midPointCircle(startCoordinates,endCoordinates);
 
-            frameBuffer.pointsToFrameBuffer(pixelsToPaint);
-            paintPoints();
-            // reset
-            countClicks = 0;
-            startCoordinates = {};
-            endCoordinates = {};
-        }
+var openTranslationWindow = function(){
+    let bgPanel = document.getElementById("bgpanel");
+    bgPanel.classList.toggle("invisible");
+    let translationPanel = document.getElementById("translation-panel");
+    translationPanel.classList.toggle("invisible");
+    document.getElementById("translation-cancel").onclick = function(){
+        translationPanel.classList.toggle("invisible");
+        bgPanel.classList.toggle("invisible");
+    }
+    document.getElementById("translation-ok").onclick = function(){
+        let xTranslation = Number(document.getElementById("translation-x").value);
+        let yTranslation = Number(document.getElementById("translation-y").value);
+
+        let f = Algorithms.translation(frameBuffer,xTranslation,yTranslation);
+        // console.log("depois");
+        frameBuffer = f;
+        console.log(frameBuffer);
+        paintPoints();
+
+        translationPanel.classList.toggle("invisible");
+        bgPanel.classList.toggle("invisible");
+    }
 
 
 
-});
+}
 
-document.getElementById("grid").appendChild(grid);
+
 
 
 
@@ -258,37 +297,49 @@ function clickableGrid( rows, cols, callback ){
 /***/ (function(module, exports, __webpack_require__) {
 
 var Pixel = __webpack_require__(4);
-var Color = __webpack_require__ (0);
+var Color = __webpack_require__(0);
 
 class FrameBuffer {
 
-    constructor (width,height){
+    constructor(width, height) {
         this.height = height;
         this.width = width;
         this.frameBuffer = new Array(height);
-        for (var i=0 ; i< height; i++){
+        this.baseColor = new Color(255, 255, 255);
+        this.edgeColor = new Color (0,0,0);
+        for (var i = 0; i < height; i++) {
             this.frameBuffer[i] = new Array(width);
         }
 
-        for (var i =0; i <this.height; i++){
-            for (var j = 0 ; j < this.width ; j++){
-                this.frameBuffer[i][j] = new Pixel(j,i,new Color(255,255,255));
+        for (var i = 0; i < this.height; i++) {
+            for (var j = 0; j < this.width; j++) {
+                this.frameBuffer[i][j] = new Pixel(j, i, new Color(255, 255, 255));
             }
         }
     }
 
-    getPixel(x,y){
+    getPixel(x, y) {
         return this.frameBuffer[y][x];
     }
 
-
-
-    pointsToFrameBuffer(pixelsToPaint){
-        for (let i=0; i < pixelsToPaint.length -1 ; i+=2){
-            this.getPixel(pixelsToPaint[i],pixelsToPaint[i+1]).color = new Color(0,0,200);
+    setPixel(x,y,pixel){
+        if(y < this.height && x < this.width ){
+            pixel.setX(x);
+            pixel.setY(y);
+            this.frameBuffer[y][x] = pixel;
         }
+
     }
 
+    getBaseColor(){
+        return this.baseColor;
+    }
+
+    pointsToFrameBuffer(pixelsToPaint) {
+        for (let i = 0; i < pixelsToPaint.length - 1; i += 2) {
+            this.getPixel(pixelsToPaint[i], pixelsToPaint[i + 1]).color = this.edgeColor;
+        }
+    }
 
 
 
@@ -304,34 +355,25 @@ const color = __webpack_require__ (0)
 
 class Pixel{
     constructor(x,y,color){
-        this._size = 10;
-        this._padding = this.size * 1.3;
-        this._x = x;
-        this._y = y;
-        this._color = color;
-    }
-    get size() {
-        return this._size;
+        this.size = 10;
+        this.padding = this.size * 1.3;
+        this.x = x;
+        this.y = y;
+        this.color = color;
     }
 
-    get padding() {
-        return this._padding;
+    getColor(){
+        return this.color;
     }
 
-    get x() {
-        return this._x;
+    setX(x){
+        this.x = x;
     }
 
-    get y() {
-        return this._y;
+    setY(y){
+        this.y = y;
     }
 
-    get color() {
-        return this._color;
-    }
-    set color(color) {
-        this._color = color;
-    }
 
 }
 
@@ -339,11 +381,15 @@ module.exports = Pixel;
 
 /***/ }),
 /* 5 */
-/***/ (function(module, exports) {
+/***/ (function(module, exports, __webpack_require__) {
+
+var Pixel = __webpack_require__(4);
+var Color = __webpack_require__(0);
+var FrameBuffer = __webpack_require__(3);
 
 class Algorithms{
     // TODO: make operations directly on framebuffer
-    static bresenham(startCoordinates,endCoordinates){
+    static bresenham(startCoordinates,endCoordinates,framebuffer){
         // console.log("Started Bresenham");
         // Flags to keep track of what's done in reflection stage
         let swapXY = false, swapX = false, swapY = false;
@@ -487,6 +533,22 @@ class Algorithms{
 
 
     }
+
+    static translation(framebuffer,moveX,moveY) {
+
+        let translatedBuffer = new FrameBuffer(framebuffer.width, framebuffer.height);
+        for (let y = 0; y < framebuffer.height; y++) {
+            for (let x = 0; x < framebuffer.width; x++) {
+                let pixel = framebuffer.getPixel(x, y);
+                if (pixel.getColor().getRGB() !== framebuffer.getBaseColor().getRGB()) {
+                    translatedBuffer.setPixel(x + moveX, y + moveY, pixel);
+                }
+            }
+        }
+
+        return translatedBuffer;
+    }
+
 
 }
 
