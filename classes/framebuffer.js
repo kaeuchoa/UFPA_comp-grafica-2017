@@ -25,12 +25,16 @@ class FrameBuffer {
     }
 
     setPixel(x,y,pixel){
-        if(y < this.height && x < this.width ){
+        if((y>=0 && y < this.height) &&(x>=0 && x < this.width )){
             pixel.setX(x);
             pixel.setY(y);
             this.frameBuffer[y][x] = pixel;
         }
 
+    }
+
+    setEdgeColor(color){
+        this.edgeColor = color;
     }
 
     getBaseColor(){

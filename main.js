@@ -8,7 +8,7 @@ let VertexTable = require("./classes/vertextable");
 
 // FOR TESTING PURPOSES
 
-let smallGrid = {width:7,height:7};
+let smallGrid = {width:15,height:15};
 let bigGrid = {width:120,height:60};
 
 // CONFIGS
@@ -42,18 +42,17 @@ var grid = clickableGrid(HEIGHT,WIDTH,function(el,x,y){
         countClicks++;
         startCoordinates.x = x;
         startCoordinates.y = y;
-        // vertexTable.addVertex(x,y);
+        vertexTable.addVertex(x,y);
         el.style.backgroundColor = "rgb(255,0,0)";
     }else if (countClicks === 1) {
         endCoordinates.x = x;
         endCoordinates.y = y;
-        // vertexTable.addVertex(x,y);
+        vertexTable.addVertex(x,y);
         if (operation === LINE_OPERATION)
-            pixelsToPaint = Algorithms.bresenham(startCoordinates, endCoordinates);
+           Algorithms.bresenham(startCoordinates, endCoordinates,frameBuffer);
         else if (operation === CIRCLE_OPERATION)
-            pixelsToPaint = Algorithms.midPointCircle(startCoordinates,endCoordinates);
+           Algorithms.midPointCircle(startCoordinates,endCoordinates,frameBuffer);
 
-        frameBuffer.pointsToFrameBuffer(pixelsToPaint);
         paintPoints();
         // reset
         countClicks = 0;
@@ -81,9 +80,11 @@ document.getElementById("translation").onclick = function () {
     openTranslationWindow();
 }
 
-// document.getElementById("bgpanel").onclick = function () {
-//     document.getElementById("bgpanel").classList.toggle("invisible");
-// }
+document.getElementById("scale").onclick = function(){
+    // console.log(vertexTable);
+    frameBuffer = Algorithms.scale(frameBuffer,vertexTable,2,2);
+    paintPoints();
+}
 
 // document.getElementById("fillPolygon").onclick = function () {
 //     console.log("fill");
@@ -105,11 +106,15 @@ document.getElementById("translation").onclick = function () {
 document.getElementById("clear").onclick = function(){
     frameBuffer = new FrameBuffer(WIDTH,HEIGHT);
     vertexTable = new VertexTable();
+    countClicks = 0;
     paintPoints();
 }
 
 // // TODO: http://jscolor.com/examples/ color picker
-// let color = document.getElementById("colorValue").value;
+// let color = document.getElementById("colorValue").onchange = function(){
+//     this.value;
+//     console.log("asd");
+// }
 // console.log("cor:" + color);
 
 function paintPoints(){
@@ -136,10 +141,8 @@ var openTranslationWindow = function(){
         let xTranslation = Number(document.getElementById("translation-x").value);
         let yTranslation = Number(document.getElementById("translation-y").value);
 
-        let f = Algorithms.translation(frameBuffer,xTranslation,yTranslation);
-        // console.log("depois");
-        frameBuffer = f;
-        console.log(frameBuffer);
+        frameBuffer = Algorithms.translation(frameBuffer,xTranslation,yTranslation);
+
         paintPoints();
 
         translationPanel.classList.toggle("invisible");
