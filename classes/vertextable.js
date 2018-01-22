@@ -25,6 +25,8 @@ class VertexTable {
         }
     }
 
+
+
     printVertexToConsole() {
         console.log("X\tY");
         for (let i = 0; i < this.vertexTable.length; i++) {

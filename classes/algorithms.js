@@ -4,7 +4,7 @@ var FrameBuffer = require('./framebuffer');
 let VertexTable = require("./vertextable");
 
 class Algorithms {
-    
+
     static bresenham(startCoordinates, endCoordinates, framebuffer) {
         // console.log("Started Bresenham");
         // Flags to keep track of what's done in reflection stage
@@ -74,9 +74,6 @@ class Algorithms {
             framebuffer.setPixel(pixelsToPaint[i],pixelsToPaint[i+1],
                 new Pixel(pixelsToPaint[i],pixelsToPaint[i+1],framebuffer.edgeColor));
         }
-
-
-        // return pixelsToPaint;
     }
 
     static midPointCircle(startCoordinates, endCoordinates,frameBuffer) {
@@ -187,7 +184,8 @@ class Algorithms {
         let scaledVertexTable = new VertexTable();
         let scaleMatrix = [new Array(scaleX, 0), new Array(0, scaleY)];
         let scaledPixel = [0, 0];
-        // Funciona mas falta interpolação
+
+        // it works but needs interpolation
         // for (let y = 0; y < framebuffer.height; y++) {
         //     for (let x = 0; x < framebuffer.width; x++) {
         //         currentPixel[0] = framebuffer.getPixel(x,y).x;
@@ -204,19 +202,22 @@ class Algorithms {
         // }
 
 
-        // Abordagem com o Bresenham
+        // Using Bresenham
+        let xToOrigin = vertexTable.vertexTable[0].x;
+        let yToOrigin = vertexTable.vertexTable[0].y;
         for (let i = 0; i < vertexTable.vertexTable.length; i++) {
-            currentPixel[0] = vertexTable.vertexTable[i].x;
-            currentPixel[1] = vertexTable.vertexTable[i].y;
+            currentPixel[0] = vertexTable.vertexTable[i].x - xToOrigin;
+            currentPixel[1] = vertexTable.vertexTable[i].y - yToOrigin;
             for (let i = 0; i < 2; i++) {
                 for (let j = 0; j < 2; j++) {
-                    scaledPixel[i] += currentPixel[i] * scaleMatrix[i][j];
+                    scaledPixel[i] += Math.round(currentPixel[i] * scaleMatrix[i][j]);
                 }
             }
-            scaledVertexTable.addVertex(scaledPixel[0],scaledPixel[1]);
+            scaledVertexTable.addVertex(scaledPixel[0] + xToOrigin,scaledPixel[1] + yToOrigin);
             scaledPixel = [0, 0];
         }
-
+        // updates the original vertextable
+        vertexTable.vertexTable = scaledVertexTable.vertexTable;
 
         let startCoordinates = {};
         let endCoordinates = {};
@@ -228,10 +229,10 @@ class Algorithms {
             endCoordinates.y = scaledVertexTable.vertexTable[i+1].y;
             this.bresenham(startCoordinates,endCoordinates,scaledBuffer);
         }
-        startCoordinates.x = scaledVertexTable.vertexTable[length].x;
-        startCoordinates.y = scaledVertexTable.vertexTable[length].y;
-        endCoordinates.x = scaledVertexTable.vertexTable[0].x;
-        endCoordinates.y = scaledVertexTable.vertexTable[0].y;
+        startCoordinates.x = scaledVertexTable.vertexTable[0].x;
+        startCoordinates.y = scaledVertexTable.vertexTable[0].y;
+        endCoordinates.x = scaledVertexTable.vertexTable[length].x;
+        endCoordinates.y = scaledVertexTable.vertexTable[length].y;
         this.bresenham(startCoordinates,endCoordinates,scaledBuffer);
 
 
@@ -239,7 +240,14 @@ class Algorithms {
 
     }
 
+    static rotation(framebuffer,vertexTable, rotationX, rotationY) {
+        let currentPixel = [0, 0];
+        let scaledBuffer = new FrameBuffer(framebuffer.width, framebuffer.height);
+        let scaledVertexTable = new VertexTable();
+        let scaleMatrix = [new Array(scaleX, 0), new Array(0, scaleY)];
+        let scaledPixel = [0, 0];
 
+    }
 }
 
 module.exports = Algorithms;

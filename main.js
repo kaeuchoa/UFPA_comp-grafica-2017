@@ -12,8 +12,8 @@ let smallGrid = {width:15,height:15};
 let bigGrid = {width:120,height:60};
 
 // CONFIGS
-const WIDTH = bigGrid.width;
-const HEIGHT = bigGrid.height;
+const WIDTH = smallGrid.width;
+const HEIGHT = smallGrid.height;
 const LINE_OPERATION = "line";
 const CIRCLE_OPERATION = "circle";
 const BUCKET_OPERATION = "bucket";
@@ -81,7 +81,7 @@ document.getElementById("translation").onclick = function () {
 }
 
 document.getElementById("scale").onclick = function(){
-    // console.log(vertexTable);
+
     frameBuffer = Algorithms.scale(frameBuffer,vertexTable,2,2);
     paintPoints();
 }
