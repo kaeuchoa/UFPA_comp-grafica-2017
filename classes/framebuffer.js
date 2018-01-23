@@ -40,15 +40,6 @@ class FrameBuffer {
     getBaseColor(){
         return this.baseColor;
     }
-
-    pointsToFrameBuffer(pixelsToPaint) {
-        for (let i = 0; i < pixelsToPaint.length - 1; i += 2) {
-            this.getPixel(pixelsToPaint[i], pixelsToPaint[i + 1]).color = this.edgeColor;
-        }
-    }
-
-
-
 }
 
 module.exports = FrameBuffer;

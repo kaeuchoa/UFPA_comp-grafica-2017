@@ -182,7 +182,7 @@ class Algorithms {
         let currentPixel = [0, 0];
         let scaledBuffer = new FrameBuffer(framebuffer.width, framebuffer.height);
         let scaledVertexTable = new VertexTable();
-        let scaleMatrix = [new Array(scaleX, 0), new Array(0, scaleY)];
+        let scaleMatrix = [[scaleX, 0], [0, scaleY]];
         let scaledPixel = [0, 0];
 
         // it works but needs interpolation
@@ -203,14 +203,17 @@ class Algorithms {
 
 
         // Using Bresenham
+        // Translate to origin
         let xToOrigin = vertexTable.vertexTable[0].x;
         let yToOrigin = vertexTable.vertexTable[0].y;
+
+        // scale vertexes
         for (let i = 0; i < vertexTable.vertexTable.length; i++) {
             currentPixel[0] = vertexTable.vertexTable[i].x - xToOrigin;
             currentPixel[1] = vertexTable.vertexTable[i].y - yToOrigin;
             for (let i = 0; i < 2; i++) {
                 for (let j = 0; j < 2; j++) {
-                    scaledPixel[i] += Math.round(currentPixel[i] * scaleMatrix[i][j]);
+                    scaledPixel[i] += Math.round(currentPixel[j] * scaleMatrix[i][j]);
                 }
             }
             scaledVertexTable.addVertex(scaledPixel[0] + xToOrigin,scaledPixel[1] + yToOrigin);
@@ -219,6 +222,7 @@ class Algorithms {
         // updates the original vertextable
         vertexTable.vertexTable = scaledVertexTable.vertexTable;
 
+        // Draw with Bresenham
         let startCoordinates = {};
         let endCoordinates = {};
         let length = scaledVertexTable.vertexTable.length -1;
@@ -240,12 +244,51 @@ class Algorithms {
 
     }
 
-    static rotation(framebuffer,vertexTable, rotationX, rotationY) {
+    static rotation(framebuffer,vertexTable, rotation) {
         let currentPixel = [0, 0];
-        let scaledBuffer = new FrameBuffer(framebuffer.width, framebuffer.height);
-        let scaledVertexTable = new VertexTable();
-        let scaleMatrix = [new Array(scaleX, 0), new Array(0, scaleY)];
-        let scaledPixel = [0, 0];
+        rotation = rotation * Math.PI / 180;
+        let rotatedBuffer = new FrameBuffer(framebuffer.width, framebuffer.height);
+        let rotatedVertexTable = new VertexTable();
+        let rotationMatrix = [[Math.cos(rotation), -Math.sin(rotation)], [Math.sin(rotation), Math.cos(rotation)]];
+        let rotatedPixel = [0, 0];
+
+        // Translate to origin
+        let xToOrigin = vertexTable.vertexTable[0].x;
+        let yToOrigin = vertexTable.vertexTable[0].y;
+        // Rotate vertexes
+        for (let i = 0; i < vertexTable.vertexTable.length; i++) {
+            currentPixel[0] = vertexTable.vertexTable[i].x - xToOrigin;
+            currentPixel[1] = vertexTable.vertexTable[i].y - yToOrigin;
+            for (let i = 0; i < 2; i++) {
+                for (let j = 0; j < 2; j++) {
+                    rotatedPixel[i] += Math.round(currentPixel[j] * rotationMatrix[i][j]);
+                }
+            }
+            rotatedVertexTable.addVertex(Math.abs(rotatedPixel[0] + xToOrigin),Math.abs(rotatedPixel[1] + yToOrigin));
+            rotatedPixel = [0, 0];
+        }
+        // updates the original vertextable
+        vertexTable.vertexTable = rotatedVertexTable.vertexTable;
+
+        // Draw with Bresenham
+        let startCoordinates = {};
+        let endCoordinates = {};
+        let length = rotatedVertexTable.vertexTable.length -1;
+        for (let i = 0; i < length; i++) {
+            startCoordinates.x = rotatedVertexTable.vertexTable[i].x;
+            startCoordinates.y = rotatedVertexTable.vertexTable[i].y;
+            endCoordinates.x = rotatedVertexTable.vertexTable[i+1].x;
+            endCoordinates.y = rotatedVertexTable.vertexTable[i+1].y;
+            this.bresenham(startCoordinates,endCoordinates,rotatedBuffer);
+        }
+        startCoordinates.x = rotatedVertexTable.vertexTable[0].x;
+        startCoordinates.y = rotatedVertexTable.vertexTable[0].y;
+        endCoordinates.x = rotatedVertexTable.vertexTable[length].x;
+        endCoordinates.y = rotatedVertexTable.vertexTable[length].y;
+        this.bresenham(startCoordinates,endCoordinates,rotatedBuffer);
+
+
+        return rotatedBuffer;
 
     }
 }

@@ -17,5 +17,6 @@ export default function clickableGrid( rows, cols, callback ){
         }
     }
     return grid;
-}
+};
+
 

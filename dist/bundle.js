@@ -60,7 +60,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 1);
+/******/ 	return __webpack_require__(__webpack_require__.s = 4);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -98,208 +98,9 @@ module.exports = Color;
 
 /***/ }),
 /* 1 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__classes_utils__ = __webpack_require__(2);
-// IMPORTS
-
-let FrameBuffer = __webpack_require__ (3);
-let Algorithms = __webpack_require__(5);
-let Color = __webpack_require__(0);
-let VertexTable = __webpack_require__(6);
-
-
-// FOR TESTING PURPOSES
-
-let smallGrid = {width:15,height:15};
-let bigGrid = {width:120,height:60};
-
-// CONFIGS
-const WIDTH = smallGrid.width;
-const HEIGHT = smallGrid.height;
-const LINE_OPERATION = "line";
-const CIRCLE_OPERATION = "circle";
-const BUCKET_OPERATION = "bucket";
-// DEFAULT OPTION
-let operation = LINE_OPERATION;
-
-// Control variable
-let countClicks = 0;
-
-// Polygons description arrays
-let vertexTable = new VertexTable();
-
-// Grid Related
-let frameBuffer = new FrameBuffer(WIDTH,HEIGHT);
-let startCoordinates = {};
-let endCoordinates = {};
-
-var grid = Object(__WEBPACK_IMPORTED_MODULE_0__classes_utils__["a" /* default */])(HEIGHT,WIDTH,function(el,x,y){
-    // console.log("You clicked on element:",el);
-    let pixelsToPaint;
-    // Preenchimento recursivo
-    if (countClicks === 0 && operation === BUCKET_OPERATION) {
-        Algorithms.floodFill(x,y,frameBuffer,new Color(200,0,0),new Color(0,0,0));
-        paintPoints();
-    }else if(countClicks === 0 && operation !== BUCKET_OPERATION) {
-        countClicks++;
-        startCoordinates.x = x;
-        startCoordinates.y = y;
-        vertexTable.addVertex(x,y);
-        el.style.backgroundColor = "rgb(255,0,0)";
-    }else if (countClicks === 1) {
-        endCoordinates.x = x;
-        endCoordinates.y = y;
-        vertexTable.addVertex(x,y);
-        if (operation === LINE_OPERATION)
-           Algorithms.bresenham(startCoordinates, endCoordinates,frameBuffer);
-        else if (operation === CIRCLE_OPERATION)
-           Algorithms.midPointCircle(startCoordinates,endCoordinates,frameBuffer);
-
-        paintPoints();
-        // reset
-        countClicks = 0;
-        startCoordinates = {};
-        endCoordinates = {};
-    }
-});
-
-document.getElementById("grid").appendChild(grid);
-
-
-document.getElementById("line").onclick = function(){
-    operation = LINE_OPERATION;
-}
-
-document.getElementById("circle").onclick = function(){
-    operation = CIRCLE_OPERATION;
-}
-
-document.getElementById("bucket").onclick = function () {
-    operation = BUCKET_OPERATION;
-}
-
-document.getElementById("translation").onclick = function () {
-    openTranslationWindow();
-}
-
-document.getElementById("scale").onclick = function(){
-
-    frameBuffer = Algorithms.scale(frameBuffer,vertexTable,2,2);
-    paintPoints();
-}
-
-// document.getElementById("fillPolygon").onclick = function () {
-//     console.log("fill");
-//     vertexTable.addVertex(12,12);
-//     vertexTable.addVertex(12,18);
-//     vertexTable.addVertex(18,22);
-//     vertexTable.addVertex(30,12);
-//     vertexTable.addVertex(30,18);
-//     vertexTable.addVertex(24,12);
-//     Algorithms.scanlineFill(vertexTable);
-//     // vertexTable.printVertexToConsole();
-//     // vertexTable.printEdgeTableToConsole();
-//     // if (vertexTable.getNumberOfVertexes() >= 3){
-//     //     Algorithms.scanlineFill(vertexTable);
-//     //
-//     // }
-// }
-
-document.getElementById("clear").onclick = function(){
-    frameBuffer = new FrameBuffer(WIDTH,HEIGHT);
-    vertexTable = new VertexTable();
-    countClicks = 0;
-    paintPoints();
-}
-
-// // TODO: http://jscolor.com/examples/ color picker
-// let color = document.getElementById("colorValue").onchange = function(){
-//     this.value;
-//     console.log("asd");
-// }
-// console.log("cor:" + color);
-
-function paintPoints(){
-    for (let y=0; y<frameBuffer.height; y++){
-        for (let x=0; x<frameBuffer.width; x++){
-            let pixel = document.getElementById(x + "-" + y);
-            pixel.style.backgroundColor = frameBuffer.getPixel(x,y).color.getRGB();
-        }
-    }
-}
-
-
-
-var openTranslationWindow = function(){
-    let bgPanel = document.getElementById("bgpanel");
-    bgPanel.classList.toggle("invisible");
-    let translationPanel = document.getElementById("translation-panel");
-    translationPanel.classList.toggle("invisible");
-    document.getElementById("translation-cancel").onclick = function(){
-        translationPanel.classList.toggle("invisible");
-        bgPanel.classList.toggle("invisible");
-    }
-    document.getElementById("translation-ok").onclick = function(){
-        let xTranslation = Number(document.getElementById("translation-x").value);
-        let yTranslation = Number(document.getElementById("translation-y").value);
-
-        frameBuffer = Algorithms.translation(frameBuffer,xTranslation,yTranslation);
-
-        paintPoints();
-
-        translationPanel.classList.toggle("invisible");
-        bgPanel.classList.toggle("invisible");
-    }
-
-
-
-}
-
-
-
-
-
-
-
-
-
-/***/ }),
-/* 2 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony export (immutable) */ __webpack_exports__["a"] = clickableGrid;
-function clickableGrid( rows, cols, callback ){
-    var grid = document.getElementById('canvas');
-    var x,y;
-    grid.className = 'grid';
-    for (var r=0;r<rows;++r){
-        var tr = grid.appendChild(document.createElement('tr'));
-        for (var c=0;c<cols;++c){
-            var cell = tr.appendChild(document.createElement('td'));
-            x = c;
-            y = r;
-            cell.id = x + "-" + y;
-            cell.addEventListener('click',(function(el,x,y){
-                return function(){
-                    callback(el,x,y);
-                }
-            })(cell,x,y),false);
-        }
-    }
-    return grid;
-}
-
-
-
-/***/ }),
-/* 3 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var Pixel = __webpack_require__(4);
+var Pixel = __webpack_require__(2);
 var Color = __webpack_require__(0);
 
 class FrameBuffer {
@@ -341,21 +142,12 @@ class FrameBuffer {
     getBaseColor(){
         return this.baseColor;
     }
-
-    pointsToFrameBuffer(pixelsToPaint) {
-        for (let i = 0; i < pixelsToPaint.length - 1; i += 2) {
-            this.getPixel(pixelsToPaint[i], pixelsToPaint[i + 1]).color = this.edgeColor;
-        }
-    }
-
-
-
 }
 
 module.exports = FrameBuffer;
 
 /***/ }),
-/* 4 */
+/* 2 */
 /***/ (function(module, exports, __webpack_require__) {
 
 const color = __webpack_require__ (0)
@@ -387,13 +179,389 @@ class Pixel{
 module.exports = Pixel;
 
 /***/ }),
+/* 3 */
+/***/ (function(module, exports) {
+
+class VertexTable {
+
+    constructor() {
+        // guarda os vértices
+        this.vertexTable = [];
+        // guarda as bordas do polígono (chamada de global após ordenação)
+        this.edgeTable = [];
+        this.activeTable = [];
+    }
+
+    addVertex(xCoord, yCoord) {
+        if (this.vertexTable.length === 0) {
+            this.vertexTable.push({x: xCoord, y: yCoord});
+        } else {
+            let containsFlag = false;
+            for (let i = 0; i < this.vertexTable.length; i++) {
+                let row = this.vertexTable[i];
+                if ((row.x === xCoord && row.y === yCoord)) {
+                    containsFlag = true;
+                    break;
+                }
+            }
+            if (!containsFlag)
+                this.vertexTable.push({x: xCoord, y: yCoord});
+        }
+    }
+
+
+
+    printVertexToConsole() {
+        console.log("X\tY");
+        for (let i = 0; i < this.vertexTable.length; i++) {
+            console.log(this.vertexTable[i].x + "\t" + this.vertexTable[i].y);
+        }
+    }
+
+
+
+    findMaxY(i) {
+        if (this.vertexTable[i].y > this.vertexTable[i + 1].y)
+            return this.vertexTable[i].y;
+        else
+            return this.vertexTable[i + 1].y;
+    }
+
+    findMinY(i) {
+        if (this.vertexTable[i].y < this.vertexTable[i + 1].y)
+            return this.vertexTable[i].y;
+        else
+            return this.vertexTable[i + 1].y;
+    }
+
+    // Tabela dos lados
+    // slope = inclinação da reta
+    buildEdgeTable() {
+        for (let i = 0; i < this.vertexTable.length - 1; i++) {
+            this.edgeTable.push({
+                yMin: this.findMinY(i),
+                yMax: this.findMaxY(i),
+                xyMin: this.vertexTable[i].x,
+                slope: this.findSlope(i)
+            });
+            if(i+1 === (this.vertexTable.length -1)){
+                this.edgeTable.push({
+                    yMin: this.findMinY(0),
+                    yMax: this.findMaxY(0),
+                    xyMin: this.vertexTable[0].y,
+                    slope: this.findSlope(0)
+                });
+            }
+        }
+    }
+
+    printEdgeTableToConsole(){
+        console.log("yMin\tyMax\txyMin\tslope");
+        for(let i = 0; i< this.edgeTable.length; i++){
+            console.log(this.edgeTable[i].yMin+"\t\t"+this.edgeTable[i].yMax+"\t\t"+this.edgeTable[i].xyMin+"\t\t"+this.edgeTable[i].slope);
+        }
+    }
+
+    findSlope(i) {
+        let dy = this.vertexTable[i + 1].y - this.vertexTable[i].y;
+        let dx = this.vertexTable[i + 1].x - this.vertexTable[i].x;
+        let slope;
+        if (dy === 0)
+            slope = 1;
+        if (dx === 0)
+            slope = 0;
+        if ((dy !== 0) && (dx !== 0)) /*- calculate inverse slope -*/
+            slope = dx / dy;
+        return slope;
+    }
+
+    getNumberOfVertexes() {
+        return this.vertexTable.length;
+    }
+
+    // produz a global table
+    sortEdgeTable() {
+        let swap;
+        // A. yMin[i] > yMin [i+1]
+        // B. yMax[i] > yMax [i+1]
+        // C. yMin[i] == yMin[i+1]
+        // D. xyMin[i] > xyMin [i+1]
+        for (let i = 0; i < this.edgeTable.length - 1; i++) {
+            for (let j = 0; j< (this.edgeTable.length -1);j++){
+                // condições
+                let A = this.edgeTable[j].yMin > this.edgeTable[j + 1].yMin;
+                let B = this.edgeTable[j].yMax > this.edgeTable[j + 1].yMax;
+                let C = this.edgeTable[j].yMin === this.edgeTable[j+1].yMin;
+                let D = this.edgeTable[j].xyMin > this.edgeTable[j+1].xyMin;
+                if ((A || B) || (C && D)){
+                    swap = this.edgeTable[j];
+                    this.edgeTable[j] = this.edgeTable[j+1];
+                    this.edgeTable[j+1] = swap;
+                }
+            }
+        }
+    }
+
+    buildActiveTable(){
+        let scanline = this.edgeTable[0].yMin;
+        for(let i=0; i<this.edgeTable.length;i++){
+            if(this.edgeTable[i].yMin === scanline) {
+                this.activeTable.push({
+                    yMax: this.edgeTable[i].yMax,
+                    xyMin: this.edgeTable[i].xyMin,
+                    slope: this.edgeTable[i].slope
+                });
+            }
+        }
+    }
+
+
+
+
+
+}
+
+module.exports = VertexTable;
+
+/***/ }),
+/* 4 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__classes_utils__ = __webpack_require__(5);
+// IMPORTS
+
+
+let FrameBuffer = __webpack_require__(1);
+let Algorithms = __webpack_require__(6);
+let Color = __webpack_require__(0);
+let VertexTable = __webpack_require__(3);
+
+
+// FOR TESTING PURPOSES
+
+let smallGrid = {width: 15, height: 15};
+let bigGrid = {width: 120, height: 60};
+
+// CONFIGS
+const WIDTH = bigGrid.width;
+const HEIGHT = bigGrid.height;
+const LINE_OPERATION = "line";
+const CIRCLE_OPERATION = "circle";
+const BUCKET_OPERATION = "bucket";
+const COHEN_CUT_OPERATION = "cohen-cut";
+// DEFAULT OPTION
+let operation = LINE_OPERATION;
+
+// Control variable
+let countClicks = 0;
+let cutFrameClicks=0;
+
+// Polygons description arrays
+let vertexTable = new VertexTable();
+let cutFrame = new VertexTable();
+
+// Grid Related
+let frameBuffer = new FrameBuffer(WIDTH, HEIGHT);
+let startCoordinates = {};
+let endCoordinates = {};
+
+let cutStartCoordinates = {};
+let cutEndCoordinates = {};
+
+var grid = Object(__WEBPACK_IMPORTED_MODULE_0__classes_utils__["a" /* default */])(HEIGHT, WIDTH, function (el, x, y) {
+    // console.log("You clicked on element:",el);
+    let pixelsToPaint;
+    // Preenchimento recursivo
+    if (countClicks === 0 && operation === BUCKET_OPERATION) {
+        Algorithms.floodFill(x, y, frameBuffer, new Color(200, 0, 0), new Color(0, 0, 0));
+        paintPoints();
+    } else if (countClicks === 0 && operation !== BUCKET_OPERATION && operation !== COHEN_CUT_OPERATION) {
+        countClicks++;
+        startCoordinates.x = x;
+        startCoordinates.y = y;
+        vertexTable.addVertex(x, y);
+        el.style.backgroundColor = "rgb(255,0,0)";
+    } else if (countClicks === 1) {
+        endCoordinates.x = x;
+        endCoordinates.y = y;
+        vertexTable.addVertex(x, y);
+        if (operation === LINE_OPERATION)
+            Algorithms.bresenham(startCoordinates, endCoordinates, frameBuffer);
+        else if (operation === CIRCLE_OPERATION)
+            Algorithms.midPointCircle(startCoordinates, endCoordinates, frameBuffer);
+
+        paintPoints();
+        // reset
+        countClicks = 0;
+        startCoordinates = {};
+        endCoordinates = {};
+    } else if (operation === COHEN_CUT_OPERATION) {
+        if (cutFrameClicks === 0 && cutFrame.vertexTable.length <=4) {
+            cutFrameClicks++;
+            cutStartCoordinates.x = x;
+            cutStartCoordinates.y = y;
+            cutFrame.addVertex(x, y);
+            el.style.backgroundColor = "rgb(255,0,0)";
+        } else if (cutFrameClicks === 1 && cutFrame.vertexTable.length <5) {
+            cutEndCoordinates.x = x;
+            cutEndCoordinates.y = y;
+            cutFrame.addVertex(x, y);
+            Algorithms.bresenham(cutStartCoordinates, cutEndCoordinates, frameBuffer);
+            paintPoints();
+            // reset
+            cutFrameClicks = 0;
+            cutStartCoordinates = {};
+            cutEndCoordinates = {};
+        }else{
+            window.alert("Só 4 pontos são permitidos nessa função");
+        }
+    }
+
+
+});
+
+function paintPoints() {
+    for (let y = 0; y < frameBuffer.height; y++) {
+        for (let x = 0; x < frameBuffer.width; x++) {
+            let pixel = document.getElementById(x + "-" + y);
+            pixel.style.backgroundColor = frameBuffer.getPixel(x, y).color.getRGB();
+        }
+    }
+}
+
+document.getElementById("grid").appendChild(grid);
+
+document.getElementById("line").onclick = function () {
+    operation = LINE_OPERATION;
+}
+
+document.getElementById("circle").onclick = function () {
+    operation = CIRCLE_OPERATION;
+}
+
+document.getElementById("bucket").onclick = function () {
+    operation = BUCKET_OPERATION;
+}
+
+document.getElementById("translation").onclick = function () {
+    openTranslationWindow();
+}
+
+document.getElementById("scale").onclick = function () {
+    frameBuffer = Algorithms.scale(frameBuffer, vertexTable, 2, 2);
+    paintPoints();
+}
+
+document.getElementById("rotation-90-right").onclick = function () {
+    frameBuffer = Algorithms.rotation(frameBuffer, vertexTable, 90);
+    paintPoints();
+}
+
+document.getElementById("rotation-90-left").onclick = function () {
+    frameBuffer = Algorithms.rotation(frameBuffer, vertexTable, -90);
+    paintPoints();
+}
+
+document.getElementById("rotation-180").onclick = function () {
+    frameBuffer = Algorithms.rotation(frameBuffer, vertexTable, 180);
+    paintPoints();
+}
+
+document.getElementById("cohen-cut").onclick = function () {
+    operation = COHEN_CUT_OPERATION;
+    // frameBuffer = Algorithms.cuttinCohen(frameBuffer, vertexTable, 180);
+    // paintPoints();
+}
+
+
+document.getElementById("clear").onclick = function () {
+    frameBuffer = new FrameBuffer(WIDTH, HEIGHT);
+    vertexTable = new VertexTable();
+    cutFrame = new VertexTable();
+    cutFrameClicks = 0;
+    countClicks = 0;
+    paintPoints();
+}
+
+// // TODO: http://jscolor.com/examples/ color picker
+// let color = document.getElementById("colorValue").onchange = function(){
+//     this.value;
+//     console.log("asd");
+// }
+// console.log("cor:" + color);
+
+
+var openTranslationWindow = function () {
+    let bgPanel = document.getElementById("bgpanel");
+    bgPanel.classList.toggle("invisible");
+    let translationPanel = document.getElementById("translation-panel");
+    translationPanel.classList.toggle("invisible");
+    document.getElementById("translation-cancel").onclick = function () {
+        translationPanel.classList.toggle("invisible");
+        bgPanel.classList.toggle("invisible");
+    }
+    document.getElementById("translation-ok").onclick = function () {
+        let xTranslation = Number(document.getElementById("translation-x").value);
+        let yTranslation = Number(document.getElementById("translation-y").value);
+        frameBuffer = Algorithms.translation(frameBuffer, xTranslation, yTranslation);
+
+        paintPoints();
+
+        translationPanel.classList.toggle("invisible");
+        bgPanel.classList.toggle("invisible");
+    }
+
+
+}
+
+
+
+
+
+
+
+
+
+/***/ }),
 /* 5 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (immutable) */ __webpack_exports__["a"] = clickableGrid;
+function clickableGrid( rows, cols, callback ){
+    var grid = document.getElementById('canvas');
+    var x,y;
+    grid.className = 'grid';
+    for (var r=0;r<rows;++r){
+        var tr = grid.appendChild(document.createElement('tr'));
+        for (var c=0;c<cols;++c){
+            var cell = tr.appendChild(document.createElement('td'));
+            x = c;
+            y = r;
+            cell.id = x + "-" + y;
+            cell.addEventListener('click',(function(el,x,y){
+                return function(){
+                    callback(el,x,y);
+                }
+            })(cell,x,y),false);
+        }
+    }
+    return grid;
+};
+
+
+
+
+/***/ }),
+/* 6 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var Pixel = __webpack_require__(4);
+var Pixel = __webpack_require__(2);
 var Color = __webpack_require__(0);
-var FrameBuffer = __webpack_require__(3);
-let VertexTable = __webpack_require__(6);
+var FrameBuffer = __webpack_require__(1);
+let VertexTable = __webpack_require__(3);
 
 class Algorithms {
 
@@ -574,7 +742,7 @@ class Algorithms {
         let currentPixel = [0, 0];
         let scaledBuffer = new FrameBuffer(framebuffer.width, framebuffer.height);
         let scaledVertexTable = new VertexTable();
-        let scaleMatrix = [new Array(scaleX, 0), new Array(0, scaleY)];
+        let scaleMatrix = [[scaleX, 0], [0, scaleY]];
         let scaledPixel = [0, 0];
 
         // it works but needs interpolation
@@ -595,14 +763,17 @@ class Algorithms {
 
 
         // Using Bresenham
+        // Translate to origin
         let xToOrigin = vertexTable.vertexTable[0].x;
         let yToOrigin = vertexTable.vertexTable[0].y;
+
+        // scale vertexes
         for (let i = 0; i < vertexTable.vertexTable.length; i++) {
             currentPixel[0] = vertexTable.vertexTable[i].x - xToOrigin;
             currentPixel[1] = vertexTable.vertexTable[i].y - yToOrigin;
             for (let i = 0; i < 2; i++) {
                 for (let j = 0; j < 2; j++) {
-                    scaledPixel[i] += Math.round(currentPixel[i] * scaleMatrix[i][j]);
+                    scaledPixel[i] += Math.round(currentPixel[j] * scaleMatrix[i][j]);
                 }
             }
             scaledVertexTable.addVertex(scaledPixel[0] + xToOrigin,scaledPixel[1] + yToOrigin);
@@ -611,6 +782,7 @@ class Algorithms {
         // updates the original vertextable
         vertexTable.vertexTable = scaledVertexTable.vertexTable;
 
+        // Draw with Bresenham
         let startCoordinates = {};
         let endCoordinates = {};
         let length = scaledVertexTable.vertexTable.length -1;
@@ -632,162 +804,56 @@ class Algorithms {
 
     }
 
-    static rotation(framebuffer,vertexTable, rotationX, rotationY) {
+    static rotation(framebuffer,vertexTable, rotation) {
         let currentPixel = [0, 0];
-        let scaledBuffer = new FrameBuffer(framebuffer.width, framebuffer.height);
-        let scaledVertexTable = new VertexTable();
-        let scaleMatrix = [new Array(scaleX, 0), new Array(0, scaleY)];
-        let scaledPixel = [0, 0];
+        rotation = rotation * Math.PI / 180;
+        let rotatedBuffer = new FrameBuffer(framebuffer.width, framebuffer.height);
+        let rotatedVertexTable = new VertexTable();
+        let rotationMatrix = [[Math.cos(rotation), -Math.sin(rotation)], [Math.sin(rotation), Math.cos(rotation)]];
+        let rotatedPixel = [0, 0];
+
+        // Translate to origin
+        let xToOrigin = vertexTable.vertexTable[0].x;
+        let yToOrigin = vertexTable.vertexTable[0].y;
+        // Rotate vertexes
+        for (let i = 0; i < vertexTable.vertexTable.length; i++) {
+            currentPixel[0] = vertexTable.vertexTable[i].x - xToOrigin;
+            currentPixel[1] = vertexTable.vertexTable[i].y - yToOrigin;
+            for (let i = 0; i < 2; i++) {
+                for (let j = 0; j < 2; j++) {
+                    rotatedPixel[i] += Math.round(currentPixel[j] * rotationMatrix[i][j]);
+                }
+            }
+            rotatedVertexTable.addVertex(Math.abs(rotatedPixel[0] + xToOrigin),Math.abs(rotatedPixel[1] + yToOrigin));
+            rotatedPixel = [0, 0];
+        }
+        // updates the original vertextable
+        vertexTable.vertexTable = rotatedVertexTable.vertexTable;
+
+        // Draw with Bresenham
+        let startCoordinates = {};
+        let endCoordinates = {};
+        let length = rotatedVertexTable.vertexTable.length -1;
+        for (let i = 0; i < length; i++) {
+            startCoordinates.x = rotatedVertexTable.vertexTable[i].x;
+            startCoordinates.y = rotatedVertexTable.vertexTable[i].y;
+            endCoordinates.x = rotatedVertexTable.vertexTable[i+1].x;
+            endCoordinates.y = rotatedVertexTable.vertexTable[i+1].y;
+            this.bresenham(startCoordinates,endCoordinates,rotatedBuffer);
+        }
+        startCoordinates.x = rotatedVertexTable.vertexTable[0].x;
+        startCoordinates.y = rotatedVertexTable.vertexTable[0].y;
+        endCoordinates.x = rotatedVertexTable.vertexTable[length].x;
+        endCoordinates.y = rotatedVertexTable.vertexTable[length].y;
+        this.bresenham(startCoordinates,endCoordinates,rotatedBuffer);
+
+
+        return rotatedBuffer;
 
     }
 }
 
 module.exports = Algorithms;
-
-/***/ }),
-/* 6 */
-/***/ (function(module, exports) {
-
-class VertexTable {
-
-    constructor() {
-        // guarda os vértices
-        this.vertexTable = [];
-        // guarda as bordas do polígono (chamada de global após ordenação)
-        this.edgeTable = [];
-        this.activeTable = [];
-    }
-
-    addVertex(xCoord, yCoord) {
-        if (this.vertexTable.length === 0) {
-            this.vertexTable.push({x: xCoord, y: yCoord});
-        } else {
-            let containsFlag = false;
-            for (let i = 0; i < this.vertexTable.length; i++) {
-                let row = this.vertexTable[i];
-                if ((row.x === xCoord && row.y === yCoord)) {
-                    containsFlag = true;
-                    break;
-                }
-            }
-            if (!containsFlag)
-                this.vertexTable.push({x: xCoord, y: yCoord});
-        }
-    }
-
-
-
-    printVertexToConsole() {
-        console.log("X\tY");
-        for (let i = 0; i < this.vertexTable.length; i++) {
-            console.log(this.vertexTable[i].x + "\t" + this.vertexTable[i].y);
-        }
-    }
-
-
-
-    findMaxY(i) {
-        if (this.vertexTable[i].y > this.vertexTable[i + 1].y)
-            return this.vertexTable[i].y;
-        else
-            return this.vertexTable[i + 1].y;
-    }
-
-    findMinY(i) {
-        if (this.vertexTable[i].y < this.vertexTable[i + 1].y)
-            return this.vertexTable[i].y;
-        else
-            return this.vertexTable[i + 1].y;
-    }
-
-    // Tabela dos lados
-    // slope = inclinação da reta
-    buildEdgeTable() {
-        for (let i = 0; i < this.vertexTable.length - 1; i++) {
-            this.edgeTable.push({
-                yMin: this.findMinY(i),
-                yMax: this.findMaxY(i),
-                xyMin: this.vertexTable[i].x,
-                slope: this.findSlope(i)
-            });
-            if(i+1 === (this.vertexTable.length -1)){
-                this.edgeTable.push({
-                    yMin: this.findMinY(0),
-                    yMax: this.findMaxY(0),
-                    xyMin: this.vertexTable[0].y,
-                    slope: this.findSlope(0)
-                });
-            }
-        }
-    }
-
-    printEdgeTableToConsole(){
-        console.log("yMin\tyMax\txyMin\tslope");
-        for(let i = 0; i< this.edgeTable.length; i++){
-            console.log(this.edgeTable[i].yMin+"\t\t"+this.edgeTable[i].yMax+"\t\t"+this.edgeTable[i].xyMin+"\t\t"+this.edgeTable[i].slope);
-        }
-    }
-
-    findSlope(i) {
-        let dy = this.vertexTable[i + 1].y - this.vertexTable[i].y;
-        let dx = this.vertexTable[i + 1].x - this.vertexTable[i].x;
-        let slope;
-        if (dy === 0)
-            slope = 1;
-        if (dx === 0)
-            slope = 0;
-        if ((dy !== 0) && (dx !== 0)) /*- calculate inverse slope -*/
-            slope = dx / dy;
-        return slope;
-    }
-
-    getNumberOfVertexes() {
-        return this.vertexTable.length;
-    }
-
-    // produz a global table
-    sortEdgeTable() {
-        let swap;
-        // A. yMin[i] > yMin [i+1]
-        // B. yMax[i] > yMax [i+1]
-        // C. yMin[i] == yMin[i+1]
-        // D. xyMin[i] > xyMin [i+1]
-        for (let i = 0; i < this.edgeTable.length - 1; i++) {
-            for (let j = 0; j< (this.edgeTable.length -1);j++){
-                // condições
-                let A = this.edgeTable[j].yMin > this.edgeTable[j + 1].yMin;
-                let B = this.edgeTable[j].yMax > this.edgeTable[j + 1].yMax;
-                let C = this.edgeTable[j].yMin === this.edgeTable[j+1].yMin;
-                let D = this.edgeTable[j].xyMin > this.edgeTable[j+1].xyMin;
-                if ((A || B) || (C && D)){
-                    swap = this.edgeTable[j];
-                    this.edgeTable[j] = this.edgeTable[j+1];
-                    this.edgeTable[j+1] = swap;
-                }
-            }
-        }
-    }
-
-    buildActiveTable(){
-        let scanline = this.edgeTable[0].yMin;
-        for(let i=0; i<this.edgeTable.length;i++){
-            if(this.edgeTable[i].yMin === scanline) {
-                this.activeTable.push({
-                    yMax: this.edgeTable[i].yMax,
-                    xyMin: this.edgeTable[i].xyMin,
-                    slope: this.edgeTable[i].slope
-                });
-            }
-        }
-    }
-
-
-
-
-
-}
-
-module.exports = VertexTable;
 
 /***/ })
 /******/ ]);

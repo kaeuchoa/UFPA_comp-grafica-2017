@@ -53,12 +53,12 @@
 </div>
 <div class="row">
     <button class="btn btn-primary" id="bucket">Preenchimento Recursivo</button>
-    <button class="btn btn-primary" id="fillPolygon">Preenchimento por Varredura</button>
-    <button class="btn btn-primary jscolor {valueElement:'valueInput', styleElement:'styleInput'}" type="button">
-        Escolha uma cor
-    </button>
-    <div id="styleInput" class="form-control" style="margin:6px;width:60px"></div>
-    <input id="colorValue" value="007bff" hidden>
+    <!--<button class="btn btn-primary" id="fillPolygon">Preenchimento por Varredura</button>-->
+    <!--<button class="btn btn-primary jscolor {valueElement:'valueInput', styleElement:'styleInput'}" type="button">-->
+        <!--Escolha uma cor-->
+    <!--</button>-->
+    <!--<div id="styleInput" class="form-control" style="margin:6px;width:60px"></div>-->
+    <!--<input id="colorValue" value="007bff" hidden>-->
 </div>
 
 <div class="row">
@@ -72,14 +72,20 @@
         </button>
         <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
             <a class="dropdown-item" href="#" id="rotation-90-right">Rotação 90° p/ direita</a>
-            <a class="dropdown-item" href="#">Rotação 90° p/ esquerda</a>
-            <a class="dropdown-item" href="#">Rotação 180°</a>
-            <a class="dropdown-item" href="#">Refletir horizontalmente</a>
-            <a class="dropdown-item" href="#">Refletir verticalmente</a>
+            <a class="dropdown-item" href="#" id="rotation-90-left">Rotação 90° p/ esquerda</a>
+            <a class="dropdown-item" href="#" id="rotation-180">Rotação 180°</a>
         </div>
     </div>
     <button class="btn btn-primary" id="translation">Translação</button>
     <button class="btn btn-primary" id="scale">Escala</button>
+</div>
+
+<div class="row">
+    <h6>Recorte</h6>
+</div>
+<div class="row">
+    <button class="btn btn-primary" id="cohen-cut">Recorte Cohen</button>
+    <!--<button class="btn btn-primary" id="circle">Círculo</button>-->
 </div>
 
 <div class="row" id="grid">
